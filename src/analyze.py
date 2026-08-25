@@ -12,7 +12,11 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 
 from lottery import Lottery
+from probability import DIGIT_HIT_PROBABILITY, all_digit_statuses, expected_wait, forecast
 from templates import Render
+
+# Số kỳ tới hiển thị trong bảng dự báo của README.
+FORECAST_DRAWS = 7
 
 # Kho dùng khi không đoán được kho đang chạy (chạy tay ngoài git, hoặc remote không phải GitHub).
 DEFAULT_REPO = 'khiemdoan/vietnam-lottery-xsmb-analysis'
@@ -147,6 +151,10 @@ if __name__ == '__main__':
     render = Render()
     context = {
         'repo': detect_repo(),
+        'digit_statuses': all_digit_statuses(results),
+        'digit_forecast': forecast(FORECAST_DRAWS),
+        'hit_probability': DIGIT_HIT_PROBABILITY,
+        'expected_wait': expected_wait(),
         'loto_result': loto_result,
         'max_count': max_count,
         'min_count': min_count,

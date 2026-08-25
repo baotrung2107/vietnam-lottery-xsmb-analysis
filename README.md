@@ -53,6 +53,39 @@ df.info()
 </details>
 
 <details>
+  <summary><h2>Digit tracker (Theo dõi chữ số 0-9 ở 2 số cuối giải đặc biệt)</h2></summary>
+
+Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác suất mỗi kỳ luôn là **19%** cho cả mười chữ số, và **không đổi** theo chuỗi vắng mặt. Trung bình phải chờ 5.3 kỳ mới có một lần, tính từ kỳ mới nhất chứ không tính ngược lại.
+
+| Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
+|:------:|:--------------:|:------------------:|:-----------------:|
+| 5 :warning: | 15 kỳ | 10-08-2026 | 4.24% |
+| 6 | 9 kỳ | 16-08-2026 | 15.01% |
+| 9 | 8 kỳ | 17-08-2026 | 18.53% |
+| 4 | 6 kỳ | 19-08-2026 | 28.24% |
+| 2 | 5 kỳ | 20-08-2026 | 34.87% |
+| 3 | 2 kỳ | 23-08-2026 | 65.61% |
+| 1 | 1 kỳ | 24-08-2026 | 81.00% |
+| 7 | 1 kỳ | 24-08-2026 | 81.00% |
+| 0 | 0 kỳ | 25-08-2026 | 100.00% |
+| 8 | 0 kỳ | 25-08-2026 | 100.00% |
+
+  <h3>Xác suất cho 7 kỳ tới (đúng cho mọi chữ số)</h3>
+
+| Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |
+|:------:|:---------------------------:|:------------------------:|
+| 1 | 19.00% | 19.00% |
+| 2 | 15.39% | 34.39% |
+| 3 | 12.47% | 46.86% |
+| 4 | 10.10% | 56.95% |
+| 5 | 8.18% | 65.13% |
+| 6 | 6.62% | 71.76% |
+| 7 | 5.37% | 77.12% |
+
+Cột phải tăng dần chỉ vì càng nhiều kỳ thì càng nhiều lượt quay, **không phải** vì chờ lâu thì dễ ra hơn. Công thức: `P(n kỳ tới đều trượt) = 0,81 ^ n`, chỉ đếm kỳ chưa quay — cộng cả kỳ đã trượt vào số mũ là sai.
+</details>
+
+<details>
   <summary><h2>Analysis of one-year Loto results (Phân tích kết quả lô tô trong 1 năm)</h2></summary>
 
   Max: 122. Min: 81.

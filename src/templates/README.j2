@@ -53,6 +53,28 @@ df.info()
 </details>
 
 <details>
+  <summary><h2>Digit tracker (Theo dõi chữ số 0-9 ở 2 số cuối giải đặc biệt)</h2></summary>
+
+Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác suất mỗi kỳ luôn là **{{ '{:.0%}'.format(hit_probability) }}** cho cả mười chữ số, và **không đổi** theo chuỗi vắng mặt. Trung bình phải chờ {{ '{:.1f}'.format(expected_wait) }} kỳ mới có một lần, tính từ kỳ mới nhất chứ không tính ngược lại.
+
+| Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
+|:------:|:--------------:|:------------------:|:-----------------:|
+{%- for status in digit_statuses %}
+| {{ status.digit }}{% if status.unusual %} :warning:{% endif %} | {{ status.streak }} kỳ | {% if status.last_seen %}{{ status.last_seen.strftime('%d-%m-%Y') }}{% else %}chưa từng{% endif %} | {{ '{:.2%}'.format(status.rarity) }} |
+{%- endfor %}
+
+  <h3>Xác suất cho {{ digit_forecast | length }} kỳ tới (đúng cho mọi chữ số)</h3>
+
+| Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |
+|:------:|:---------------------------:|:------------------------:|
+{%- for draw, first, cumulative in digit_forecast %}
+| {{ draw }} | {{ '{:.2%}'.format(first) }} | {{ '{:.2%}'.format(cumulative) }} |
+{%- endfor %}
+
+Cột phải tăng dần chỉ vì càng nhiều kỳ thì càng nhiều lượt quay, **không phải** vì chờ lâu thì dễ ra hơn. Công thức: `P(n kỳ tới đều trượt) = 0,81 ^ n`, chỉ đếm kỳ chưa quay — cộng cả kỳ đã trượt vào số mũ là sai.
+</details>
+
+<details>
   <summary><h2>Analysis of one-year Loto results (Phân tích kết quả lô tô trong 1 năm)</h2></summary>
 
   Max: {{ max_count }}. Min: {{ min_count }}.

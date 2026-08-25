@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 # Một lần bấm tay trùng giờ cron sẽ làm hai lần chạy cùng ghi vào main và đẩy nhau ra.
 concurrency:
@@ -49,3 +50,32 @@ jobs:
           git commit -m "Updated $(date +'%Y-%m-%d')"
           git pull --rebase origin main
           git push origin main
+
+      - name: Kiểm tra chữ số vắng mặt bất thường
+        id: alerts
+        run: uv run src/alerts.py
+
+      - name: Mở hoặc đóng issue cảnh báo
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ALERT: ${{ steps.alerts.outputs.alert }}
+          TITLE: ${{ steps.alerts.outputs.title }}
+          BODY_PATH: ${{ steps.alerts.outputs.body_path }}
+        run: |
+          existing=$(gh issue list --label gan-alert --state open --limit 1 --json number --jq '.[0].number // empty')
+
+          if [ "$ALERT" = "true" ]; then
+            if [ -n "$existing" ]; then
+              echo "Cập nhật issue #$existing"
+              gh issue edit "$existing" --title "$TITLE" --body-file "$BODY_PATH"
+            else
+              gh label create gan-alert --description "Chữ số vắng mặt bất thường" --color FBCA04 --force
+              gh issue create --title "$TITLE" --body-file "$BODY_PATH" --label gan-alert
+            fi
+          elif [ -n "$existing" ]; then
+            echo "Không còn chữ số nào bất thường, đóng issue #$existing"
+            gh issue comment "$existing" --body "Không còn chữ số nào vượt ngưỡng hiếm. Tự động đóng cảnh báo."
+            gh issue close "$existing"
+          else
+            echo "Không có chữ số nào vắng mặt bất thường."
+          fi
