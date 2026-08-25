@@ -16,6 +16,7 @@ dependencies = [
     "pydantic==2.13.4",
     "pydantic-settings==2.14.2",
     "cloudscraper==1.2.71",
+    "requests==2.34.2",
     "tenacity==9.1.4",
     "beautifulsoup4==4.15.0",
     "lxml==6.1.1",
@@ -38,6 +39,10 @@ linting = [
     "isort",
     "ruff",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
 
 [tool.isort]
 line_length = 120
