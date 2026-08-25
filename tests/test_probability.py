@@ -185,3 +185,53 @@ def test_forecast_grows_toward_certainty_but_never_reaches_it():
 def test_forecast_first_hit_column_shrinks_every_draw():
     first = [row[1] for row in probability.forecast(10)]
     assert first == sorted(first, reverse=True)
+
+
+# --- chữ số của giải bảy ---
+
+
+def draws_with_prize7(specials: list[int], prize7: list[list[int]]) -> pd.DataFrame:
+    data = {
+        'date': pd.date_range('2026-01-01', periods=len(specials), freq='D'),
+        'special': specials,
+    }
+    for position in range(1, 5):
+        data[f'prize7_{position}'] = [row[position - 1] for row in prize7]
+    return pd.DataFrame(data)
+
+
+def test_distinct_digits_deduplicates_and_sorts():
+    assert probability.distinct_digits([91, 9, 45, 84]) == [0, 1, 4, 5, 8, 9]
+    assert probability.distinct_digits([55, 55]) == [5]
+
+
+def test_latest_prize7_reads_the_newest_draw():
+    data = draws_with_prize7([12, 80], [[11, 22, 33, 44], [91, 9, 45, 84]])
+    assert probability.latest_prize7(data) == [91, 9, 45, 84]
+
+
+def test_prize7_digit_statuses_covers_every_digit_of_the_latest_draw():
+    data = draws_with_prize7([57, 80, 41, 22], [[11, 22, 33, 44]] * 3 + [[91, 9, 45, 84]])
+    numbers, statuses = probability.prize7_digit_statuses(data)
+
+    assert numbers == [91, 9, 45, 84]
+    assert [status.digit for status in statuses] == sorted(
+        [s.digit for s in statuses], key=lambda d: -next(s.streak for s in statuses if s.digit == d)
+    )
+    assert sorted(status.digit for status in statuses) == [0, 1, 4, 5, 8, 9]
+
+
+def test_prize7_statuses_are_sorted_longest_streak_first():
+    data = draws_with_prize7([57, 80, 41, 22], [[11, 22, 33, 44]] * 3 + [[91, 9, 45, 84]])
+    _, statuses = probability.prize7_digit_statuses(data)
+    streaks = [status.streak for status in statuses]
+    assert streaks == sorted(streaks, reverse=True)
+
+
+def test_prize7_digit_streak_is_measured_against_the_special_tail_not_prize7():
+    """Chữ số 5 nằm trong giải bảy kỳ này, nhưng chuỗi vắng đếm trên 2 số cuối giải đặc biệt."""
+    data = draws_with_prize7([57, 80, 41, 22], [[11, 22, 33, 44]] * 3 + [[91, 9, 45, 84]])
+    _, statuses = probability.prize7_digit_statuses(data)
+    five = next(status for status in statuses if status.digit == 5)
+    assert five.streak == 3
+    assert five.last_seen == pd.Timestamp('2026-01-01').date()

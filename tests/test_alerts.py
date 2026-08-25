@@ -80,3 +80,35 @@ def test_load_results_reads_the_published_dataset():
     data = alerts.load_results()
     assert {'date', 'special'} <= set(data.columns)
     assert len(data) > 7000
+
+
+def test_report_includes_the_prize7_section_when_given_one():
+    report = alerts.build_report([QUIET, NORMAL], pd.Timestamp('2026-08-25'), [91, 9, 45, 84], [QUIET, NORMAL])
+    assert 'Chữ số của giải bảy kỳ mới nhất' in report
+    assert '`91`' in report and '`09`' in report
+    assert 'chữ số **5** đang vắng mặt bất thường' in report
+
+
+def test_report_says_when_no_prize7_digit_is_unusual():
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), [11, 22, 33, 44], [NORMAL])
+    assert 'Không chữ số nào trong giải bảy kỳ này đang vắng mặt bất thường' in report
+
+
+def test_report_omits_the_prize7_section_when_not_given():
+    report = alerts.build_report([QUIET], pd.Timestamp('2026-08-25'))
+    assert 'Chữ số của giải bảy' not in report
+
+
+def test_report_states_that_prize7_carries_no_signal():
+    """Không có câu này thì bảng giải bảy sẽ bị đọc thành gợi ý cho giải đặc biệt."""
+    report = alerts.build_report([QUIET], pd.Timestamp('2026-08-25'), [91, 9, 45, 84], [QUIET])
+    assert 'quay trước giải đặc biệt vài phút' in report
+    assert 'bằng đúng mức của một chữ số lấy ngẫu nhiên' in report
+
+
+def test_main_prints_the_prize7_digits(capsys, monkeypatch, tmp_path):
+    monkeypatch.setenv('RUNNER_TEMP', str(tmp_path))
+    monkeypatch.delenv('GITHUB_OUTPUT', raising=False)
+    monkeypatch.delenv('GITHUB_STEP_SUMMARY', raising=False)
+    alerts.main()
+    assert 'Giải bảy kỳ mới nhất:' in capsys.readouterr().out

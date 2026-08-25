@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from probability import DIGIT_HIT_PROBABILITY, UNUSUAL_RARITY, DigitStatus, all_digit_statuses, expected_wait, forecast
+import probability
 
 DATA_FILE = 'data/xsmb.csv'
 FORECAST_DRAWS = 7
@@ -30,7 +30,7 @@ def load_results(path: str = DATA_FILE) -> pd.DataFrame:
     return pd.read_csv(path, parse_dates=['date'])
 
 
-def format_table(statuses: list[DigitStatus]) -> str:
+def format_table(statuses: list[probability.DigitStatus]) -> str:
     lines = [
         '| Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi này |',
         '|:------:|:--------------:|:------------------:|:---------------------:|',
@@ -47,12 +47,35 @@ def format_forecast() -> str:
         '| Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |',
         '|:------:|:---------------------------:|:------------------------:|',
     ]
-    for draw, first, cumulative in forecast(FORECAST_DRAWS):
+    for draw, first, cumulative in probability.forecast(FORECAST_DRAWS):
         lines.append(f'| {draw} | {first:.2%} | {cumulative:.2%} |')
     return '\n'.join(lines)
 
 
-def build_report(statuses: list[DigitStatus], last_date: pd.Timestamp) -> str:
+def format_prize7(numbers: list[int], statuses: list[probability.DigitStatus]) -> str:
+    """Bảng chữ số của giải bảy kỳ mới nhất kèm tình trạng vắng mặt ở 2 số cuối giải đặc biệt."""
+    drawn = ', '.join(f'`{value:02d}`' for value in numbers)
+    lines = [
+        f'Giải bảy kỳ mới nhất: {drawn} — gồm các chữ số '
+        + ', '.join(f'**{status.digit}**' for status in sorted(statuses, key=lambda s: s.digit))
+        + '.',
+        '',
+        '| Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi này |',
+        '|:------:|:--------------:|:------------------:|:---------------------:|',
+    ]
+    for status in statuses:
+        last_seen = f'{status.last_seen:%d/%m/%Y}' if status.last_seen else 'chưa từng'
+        flag = ' ⚠️' if status.unusual else ''
+        lines.append(f'| **{status.digit}**{flag} | {status.streak} kỳ | {last_seen} | {status.rarity:.2%} |')
+    return '\n'.join(lines)
+
+
+def build_report(
+    statuses: list[probability.DigitStatus],
+    last_date: pd.Timestamp,
+    prize7_numbers: list[int] | None = None,
+    prize7_statuses: list[probability.DigitStatus] | None = None,
+) -> str:
     unusual = [status for status in statuses if status.unusual]
 
     parts = [
@@ -68,7 +91,16 @@ def build_report(statuses: list[DigitStatus], last_date: pd.Timestamp) -> str:
                 f'Một chuỗi dài như vậy chỉ xuất hiện với khả năng {status.rarity:.2%}.'
             )
     else:
-        parts.append(f'- Không có chữ số nào vượt ngưỡng hiếm {UNUSUAL_RARITY:.0%}.')
+        parts.append(f'- Không có chữ số nào vượt ngưỡng hiếm {probability.UNUSUAL_RARITY:.0%}.')
+
+    if prize7_numbers and prize7_statuses:
+        quiet = [status for status in prize7_statuses if status.unusual]
+        parts += ['', '## Chữ số của giải bảy kỳ mới nhất', '', format_prize7(prize7_numbers, prize7_statuses), '']
+        if quiet:
+            digits = ', '.join(str(status.digit) for status in quiet)
+            parts.append(f'Trong đó chữ số **{digits}** đang vắng mặt bất thường.')
+        else:
+            parts.append('Không chữ số nào trong giải bảy kỳ này đang vắng mặt bất thường.')
 
     parts += [
         '',
@@ -83,11 +115,15 @@ def build_report(statuses: list[DigitStatus], last_date: pd.Timestamp) -> str:
         '## Đọc cho đúng',
         '',
         f'Mỗi chữ số 0-9 nằm trong đúng **19/100** số hai chữ số, nên xác suất mỗi kỳ luôn là '
-        f'**{DIGIT_HIT_PROBABILITY:.0%}** — giống hệt nhau cho cả mười chữ số và **không đổi** dù đang '
-        f'vắng mặt bao lâu. Trung bình phải chờ {expected_wait():.1f} kỳ mới có một lần, tính từ hôm nay '
+        f'**{probability.DIGIT_HIT_PROBABILITY:.0%}** — giống hệt nhau cho cả mười chữ số và **không đổi** dù đang '
+        f'vắng mặt bao lâu. Trung bình phải chờ {probability.expected_wait():.1f} kỳ mới có một lần, tính từ hôm nay '
         f'chứ không tính ngược lại.',
         '',
         'Cảnh báo này nói rằng chuyện **đã xảy ra** là hiếm. Nó không nói chữ số đó sắp về.',
+        '',
+        'Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ là có liên hệ. Đo trên toàn bộ '
+        'lịch sử thì không có: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt đúng 19% '
+        'số kỳ, bằng đúng mức của một chữ số lấy ngẫu nhiên.',
     ]
     return '\n'.join(parts)
 
@@ -102,8 +138,9 @@ def write_output(name: str, value: str) -> None:
 def main() -> int:
     results = load_results()
     last_date = results['date'].max()
-    statuses = all_digit_statuses(results)
+    statuses = probability.all_digit_statuses(results)
     unusual = [status for status in statuses if status.unusual]
+    prize7_numbers, prize7_statuses = probability.prize7_digit_statuses(results)
 
     print(f'Tình trạng chữ số ở 2 số cuối giải đặc biệt, tính tới {last_date:%d/%m/%Y}:')
     for status in statuses:
@@ -114,7 +151,14 @@ def main() -> int:
             f'độ hiếm {status.rarity:7.2%}{mark}'
         )
 
-    report = build_report(statuses, last_date)
+    print()
+    drawn = ', '.join(f'{value:02d}' for value in prize7_numbers)
+    print(f'Giải bảy kỳ mới nhất: {drawn}')
+    for status in prize7_statuses:
+        mark = '  <-- bất thường' if status.unusual else ''
+        print(f'  chữ số {status.digit}: vắng {status.streak:3d} kỳ | độ hiếm {status.rarity:7.2%}{mark}')
+
+    report = build_report(statuses, last_date, prize7_numbers, prize7_statuses)
 
     summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
     if summary_file:

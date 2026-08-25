@@ -63,6 +63,18 @@ Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác su
 | {{ status.digit }}{% if status.unusual %} :warning:{% endif %} | {{ status.streak }} kỳ | {% if status.last_seen %}{{ status.last_seen.strftime('%d-%m-%Y') }}{% else %}chưa từng{% endif %} | {{ '{:.2%}'.format(status.rarity) }} |
 {%- endfor %}
 
+  <h3>Chữ số của giải bảy kỳ mới nhất</h3>
+
+Giải bảy kỳ này: {% for value in prize7_numbers %}`{{ '{:02d}'.format(value) }}`{% if not loop.last %}, {% endif %}{% endfor %} — gồm các chữ số {% for status in prize7_statuses|sort(attribute='digit') %}**{{ status.digit }}**{% if not loop.last %}, {% endif %}{% endfor %}.
+
+Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ là có liên hệ. Đo trên toàn bộ lịch sử thì không: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt đúng {{ '{:.0%}'.format(hit_probability) }} số kỳ, bằng đúng mức của một chữ số lấy ngẫu nhiên.
+
+| Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
+|:------:|:--------------:|:------------------:|:-----------------:|
+{%- for status in prize7_statuses %}
+| {{ status.digit }}{% if status.unusual %} :warning:{% endif %} | {{ status.streak }} kỳ | {% if status.last_seen %}{{ status.last_seen.strftime('%d-%m-%Y') }}{% else %}chưa từng{% endif %} | {{ '{:.2%}'.format(status.rarity) }} |
+{%- endfor %}
+
   <h3>Xác suất cho {{ digit_forecast | length }} kỳ tới (đúng cho mọi chữ số)</h3>
 
 | Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |

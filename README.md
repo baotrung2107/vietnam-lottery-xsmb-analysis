@@ -70,6 +70,21 @@ Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác su
 | 0 | 0 kỳ | 25-08-2026 | 100.00% |
 | 8 | 0 kỳ | 25-08-2026 | 100.00% |
 
+  <h3>Chữ số của giải bảy kỳ mới nhất</h3>
+
+Giải bảy kỳ này: `91`, `09`, `45`, `84` — gồm các chữ số **0**, **1**, **4**, **5**, **8**, **9**.
+
+Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ là có liên hệ. Đo trên toàn bộ lịch sử thì không: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt đúng 19% số kỳ, bằng đúng mức của một chữ số lấy ngẫu nhiên.
+
+| Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
+|:------:|:--------------:|:------------------:|:-----------------:|
+| 5 :warning: | 15 kỳ | 10-08-2026 | 4.24% |
+| 9 | 8 kỳ | 17-08-2026 | 18.53% |
+| 4 | 6 kỳ | 19-08-2026 | 28.24% |
+| 1 | 1 kỳ | 24-08-2026 | 81.00% |
+| 0 | 0 kỳ | 25-08-2026 | 100.00% |
+| 8 | 0 kỳ | 25-08-2026 | 100.00% |
+
   <h3>Xác suất cho 7 kỳ tới (đúng cho mọi chữ số)</h3>
 
 | Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |

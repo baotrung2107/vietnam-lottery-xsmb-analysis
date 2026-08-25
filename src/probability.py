@@ -116,3 +116,32 @@ def forecast(draws: int, probability: float = DIGIT_HIT_PROBABILITY) -> list[tup
         (draw, probability_first_hit_on(draw, probability), probability_at_least_once(draw, probability))
         for draw in range(1, draws + 1)
     ]
+
+
+def distinct_digits(numbers: list[int]) -> list[int]:
+    """Các chữ số phân biệt tạo nên một nhóm số hai chữ số, xếp tăng dần."""
+    found: set[int] = set()
+    for value in numbers:
+        found.add(value // 10)
+        found.add(value % 10)
+    return sorted(found)
+
+
+def latest_prize7(results: pd.DataFrame) -> list[int]:
+    """Bốn số của giải bảy ở kỳ mới nhất."""
+    latest = results.iloc[-1]
+    return [int(latest[f'prize7_{position}']) % 100 for position in range(1, 5)]
+
+
+def prize7_digit_statuses(
+    results: pd.DataFrame, unusual_rarity: float = UNUSUAL_RARITY
+) -> tuple[list[int], list[DigitStatus]]:
+    """Giải bảy kỳ mới nhất, kèm tình trạng vắng mặt của từng chữ số tạo nên nó.
+
+    Giải bảy quay trước giải đặc biệt vài phút trong cùng buổi, nên hay bị nghĩ là có liên hệ.
+    Đo trên toàn bộ lịch sử thì không: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt
+    đúng 19% số kỳ, bằng nền ngẫu nhiên. Bảng này để theo dõi, không phải để dự đoán.
+    """
+    numbers = latest_prize7(results)
+    statuses = [digit_status(results, digit, unusual_rarity) for digit in distinct_digits(numbers)]
+    return numbers, sorted(statuses, key=lambda status: -status.streak)
