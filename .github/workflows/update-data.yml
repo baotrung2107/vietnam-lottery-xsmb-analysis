@@ -62,7 +62,14 @@ jobs:
           TITLE: ${{ steps.alerts.outputs.title }}
           BODY_PATH: ${{ steps.alerts.outputs.body_path }}
         run: |
-          existing=$(gh issue list --label gan-alert --state open --limit 1 --json number --jq '.[0].number // empty')
+          # Kho fork mặc định tắt Issues. Thiếu nó thì chỉ mất phần nhắc, không được làm đỏ cả job.
+          if ! gh issue list --limit 1 >/dev/null 2>&1; then
+            echo "::warning::Kho chưa bật Issues nên không gửi được cảnh báo. Bật ở Settings > General > Features > Issues."
+            exit 0
+          fi
+
+          # Nhãn chưa tồn tại thì lệnh list báo lỗi — coi như chưa có issue nào đang mở.
+          existing=$(gh issue list --label gan-alert --state open --limit 1 --json number --jq '.[0].number // empty' 2>/dev/null || true)
 
           if [ "$ALERT" = "true" ]; then
             if [ -n "$existing" ]; then
