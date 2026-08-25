@@ -85,15 +85,17 @@ Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ l
 | 0 | 0 kỳ | 25-08-2026 | 100.00% |
 | 8 | 0 kỳ | 25-08-2026 | 100.00% |
 
-  <h3>Chu kỳ A/B của giải bảy thứ nhất</h3>
+  <h3>Chu kỳ A, B của giải bảy thứ nhất</h3>
 
-Biến cố: A hoặc B của số giải bảy **thứ nhất** có mặt trong 2 số cuối giải đặc biệt cùng kỳ (tỉ lệ 35.0% mỗi kỳ).
+Biến cố: chữ số **A** (hàng chục) và **B** (hàng đơn vị) của số giải bảy thứ nhất có mặt trong 2 số cuối giải đặc biệt cùng kỳ.
 
-- Đang trượt liên tiếp: **1 kỳ** (lần trúng gần nhất: 24-08-2026)
-- Nhịp lịch sử giữa hai lần trúng: trung bình **2.9 kỳ**, một nửa số lần chờ ≤ 2 kỳ, 90% ≤ 6 kỳ, dài nhất từng ghi nhận 21 kỳ
-- Ngưỡng cảnh báo: trượt **7 kỳ liên tiếp** trở lên — mức hiếm so với chu kỳ lịch sử, không phải mức trung bình
+| Biến cố | Tỉ lệ/kỳ | Lượt trúng | Đang trượt | Lần trúng gần nhất | TB cách | Trung vị | 90% ≤ | Dài nhất | Ngưỡng báo |
+|:-------:|:--------:|:----------:|:----------:|:------------------:|:-------:|:--------:|:-----:|:--------:|:----------:|
+| **Chỉ A** | 19.2% | 1449 | **1 kỳ** | 24-08-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
+| **Chỉ B** | 19.2% | 1448 | **2 kỳ** | 23-08-2026 | 5.2 kỳ | 4 | 11 | 34 | 15 kỳ |
+| **A hoặc B** | 35.0% | 2634 | **1 kỳ** | 24-08-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
 
-Vượt ngưỡng nghĩa là chuỗi chờ đã dài hiếm thấy so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn: xác suất kỳ tới vẫn là 35.0%.
+Ngưỡng của **A hoặc B** đặt ở mức báo sớm 5 kỳ theo yêu cầu (độ hiếm ~11,6% — sẽ kêu vài lần mỗi tháng); A và B riêng lẻ theo mức hiếm 5% (15 kỳ). Chạm ngưỡng nghĩa là chuỗi chờ đã dài so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn.
 
   <h3>Xác suất cho 7 kỳ tới (đúng cho mọi chữ số)</h3>
 

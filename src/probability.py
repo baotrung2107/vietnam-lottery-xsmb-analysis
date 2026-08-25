@@ -149,45 +149,70 @@ def prize7_digit_statuses(
 
 
 def prize7_ab_hits(results: pd.DataFrame) -> pd.Series:
-    """Chuỗi trúng/trượt theo kỳ: A hoặc B của số GIẢI BẢY THỨ NHẤT có mặt trong 2 số cuối giải đặc biệt."""
+    """Chuỗi trúng/trượt theo kỳ: A HOẶC B của số giải bảy thứ nhất có mặt trong 2 số cuối giải đặc biệt."""
+    return prize7_a_hits(results) | prize7_b_hits(results)
+
+
+def prize7_a_hits(results: pd.DataFrame) -> pd.Series:
+    """A (chữ số hàng chục của số giải bảy thứ nhất) có mặt trong 2 số cuối giải đặc biệt."""
     tails = results['special'] % 100
-    first = results['prize7_1'] % 100
-    tens, ones = tails // 10, tails % 10
-    a, b = first // 10, first % 10
-    return (a == tens) | (a == ones) | (b == tens) | (b == ones)
+    a = (results['prize7_1'] % 100) // 10
+    return (a == tails // 10) | (a == tails % 10)
+
+
+def prize7_b_hits(results: pd.DataFrame) -> pd.Series:
+    """B (chữ số hàng đơn vị của số giải bảy thứ nhất) có mặt trong 2 số cuối giải đặc biệt."""
+    tails = results['special'] % 100
+    b = (results['prize7_1'] % 100) % 10
+    return (b == tails // 10) | (b == tails % 10)
+
+
+# Ngưỡng báo sớm cho biến cố gộp A hoặc B, theo yêu cầu người dùng: từ 5 kỳ trượt liên tiếp.
+# Với tỉ lệ 35%/kỳ, chuỗi 5 kỳ có độ hiếm 0,65^5 ≈ 11,6% — tức cảnh báo sẽ sáng khá thường xuyên;
+# đây là lựa chọn chủ động đánh đổi ồn lấy sớm. Các biến cố đơn A, B giữ ngưỡng theo độ hiếm 5%.
+PRIZE7_AB_ALERT_STREAK = 5
+
+
+def default_alert_streak(hit_rate: float, unusual_rarity: float = UNUSUAL_RARITY) -> int:
+    """Chuỗi trượt ngắn nhất có độ hiếm dưới `unusual_rarity` với tỉ lệ trúng đã cho.
+
+    hit_rate = 0 (biến cố chưa từng trúng — gặp được trên mẫu nhỏ) thì không chuỗi nào là hiếm:
+    trả về một ngưỡng không bao giờ chạm tới, thay vì lặp vô hạn.
+    """
+    if hit_rate <= 0:
+        return 10**9
+    if hit_rate >= 1:
+        return 1
+    streak = 0
+    while (1 - hit_rate) ** streak >= unusual_rarity:
+        streak += 1
+    return streak
 
 
 class CycleStatus(NamedTuple):
+    name: str  # tên biến cố, dùng để hiển thị
     streak: int  # số kỳ trượt liên tiếp tính tới kỳ mới nhất
     last_hit: date | None
+    hits: int  # tổng số lượt trúng trong toàn lịch sử
     hit_rate: float  # tỉ lệ trúng đo trên toàn lịch sử
     mean_gap: float  # trung bình cách bao nhiêu kỳ giữa hai lần trúng
     median_gap: float
     p90_gap: int  # 90% các lần chờ đều ngắn hơn hoặc bằng mức này
     max_gap: int  # lần chờ dài nhất từng ghi nhận
-    rarity: float  # khả năng một chuỗi trượt dài bằng chừng này, tính từ điểm bất kỳ
+    rarity: float  # độ hiếm của chuỗi trượt hiện tại: (1 - hit_rate) ^ streak
+    alert_streak: int  # trượt từ mức này trở lên thì cảnh báo
     unusual: bool
 
-    @property
-    def alert_streak(self) -> int:
-        """Chuỗi trượt ngắn nhất bị coi là bất thường với hit_rate hiện tại."""
-        streak = 0
-        while (1 - self.hit_rate) ** streak >= UNUSUAL_RARITY:
-            streak += 1
-        return streak
 
-
-def prize7_ab_cycle(
-    results: pd.DataFrame, unusual_rarity: float = UNUSUAL_RARITY, hit_rate: float | None = None
+def _cycle(
+    name: str,
+    hit_series: pd.Series,
+    dates,
+    hit_rate: float | None,
+    alert_streak: int | None,
+    unusual_rarity: float,
 ) -> CycleStatus:
-    """Chu kỳ xuất hiện của biến cố A/B giải bảy thứ nhất, và chuỗi trượt đang chạy.
-
-    Ngưỡng cảnh báo KHÔNG đặt ở mức trung bình (vượt trung bình là chuyện thường ngày) mà ở mức
-    hiếm: chuỗi trượt dài tới độ chỉ xuất hiện dưới `unusual_rarity` khả năng. Cảnh báo mô tả
-    chuyện đã xảy ra là hiếm so với chu kỳ lịch sử — xác suất kỳ tới vẫn bằng hit_rate, không đổi.
-    """
-    hits = prize7_ab_hits(results).to_numpy()
-    dates = results['date'].to_numpy()
+    hits = hit_series.to_numpy()
 
     streak = 0
     last_hit = None
@@ -199,19 +224,64 @@ def prize7_ab_cycle(
 
     if hit_rate is None:
         hit_rate = float(hits.mean())
+    if alert_streak is None:
+        alert_streak = default_alert_streak(hit_rate, unusual_rarity)
 
     positions = np.flatnonzero(hits)
     gaps = np.diff(positions) if len(positions) > 1 else np.array([1])
 
-    rarity = (1 - hit_rate) ** streak
     return CycleStatus(
+        name=name,
         streak=streak,
         last_hit=last_hit,
+        hits=int(hits.sum()),
         hit_rate=hit_rate,
         mean_gap=float(gaps.mean()),
         median_gap=float(np.median(gaps)),
         p90_gap=int(np.percentile(gaps, 90)),
         max_gap=int(gaps.max()),
-        rarity=rarity,
-        unusual=rarity < unusual_rarity,
+        rarity=(1 - hit_rate) ** streak,
+        alert_streak=alert_streak,
+        unusual=streak >= alert_streak,
     )
+
+
+def prize7_ab_cycle(
+    results: pd.DataFrame,
+    unusual_rarity: float = UNUSUAL_RARITY,
+    hit_rate: float | None = None,
+    alert_streak: int | None = PRIZE7_AB_ALERT_STREAK,
+) -> CycleStatus:
+    """Chu kỳ biến cố gộp: A hoặc B của giải bảy thứ nhất có mặt trong 2 số cuối giải đặc biệt.
+
+    Ngưỡng mặc định 5 kỳ là mức BÁO SỚM người dùng chọn (độ hiếm ~11,6%), không phải mức hiếm 5%.
+    Cảnh báo mô tả chuỗi chờ đã dài so với nhịp lịch sử — xác suất kỳ tới vẫn bằng hit_rate.
+    """
+    return _cycle(
+        'A hoặc B', prize7_ab_hits(results), results['date'].to_numpy(), hit_rate, alert_streak, unusual_rarity
+    )
+
+
+def prize7_a_cycle(
+    results: pd.DataFrame,
+    unusual_rarity: float = UNUSUAL_RARITY,
+    hit_rate: float | None = None,
+    alert_streak: int | None = None,
+) -> CycleStatus:
+    """Chu kỳ riêng của A (hàng chục giải bảy 1) trong 2 số cuối giải đặc biệt — tỉ lệ ~19%/kỳ."""
+    return _cycle('Chỉ A', prize7_a_hits(results), results['date'].to_numpy(), hit_rate, alert_streak, unusual_rarity)
+
+
+def prize7_b_cycle(
+    results: pd.DataFrame,
+    unusual_rarity: float = UNUSUAL_RARITY,
+    hit_rate: float | None = None,
+    alert_streak: int | None = None,
+) -> CycleStatus:
+    """Chu kỳ riêng của B (hàng đơn vị giải bảy 1) trong 2 số cuối giải đặc biệt — tỉ lệ ~19%/kỳ."""
+    return _cycle('Chỉ B', prize7_b_hits(results), results['date'].to_numpy(), hit_rate, alert_streak, unusual_rarity)
+
+
+def prize7_cycles(results: pd.DataFrame) -> list[CycleStatus]:
+    """Cả ba chu kỳ để hiển thị chung một bảng: A, B, và A hoặc B."""
+    return [prize7_a_cycle(results), prize7_b_cycle(results), prize7_ab_cycle(results)]

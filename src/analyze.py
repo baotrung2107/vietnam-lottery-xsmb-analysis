@@ -149,14 +149,14 @@ if __name__ == '__main__':
     std = counts.std().round(2)
 
     prize7_numbers, prize7_statuses = probability.prize7_digit_statuses(results)
-    ab_cycle = probability.prize7_ab_cycle(results)
+    ab_cycles = probability.prize7_cycles(results)
 
     render = Render()
     context = {
         'repo': detect_repo(),
         'prize7_numbers': prize7_numbers,
         'prize7_statuses': prize7_statuses,
-        'ab_cycle': ab_cycle,
+        'ab_cycles': ab_cycles,
         'digit_statuses': probability.all_digit_statuses(results),
         'digit_forecast': probability.forecast(FORECAST_DRAWS),
         'hit_probability': probability.DIGIT_HIT_PROBABILITY,

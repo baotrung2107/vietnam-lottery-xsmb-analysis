@@ -70,20 +70,28 @@ def format_prize7(numbers: list[int], statuses: list[probability.DigitStatus]) -
     return '\n'.join(lines)
 
 
-def format_cycle(cycle: probability.CycleStatus) -> str:
-    """Mục chu kỳ A/B của giải bảy thứ nhất: chuỗi trượt đang chạy so với nhịp lịch sử."""
-    last_hit = f'{cycle.last_hit:%d/%m/%Y}' if cycle.last_hit else 'chưa từng'
-    flag = ' ⚠️' if cycle.unusual else ''
+def format_cycles(cycles: list[probability.CycleStatus]) -> str:
+    """Bảng chu kỳ ba biến cố của giải bảy thứ nhất: chỉ A, chỉ B, và A hoặc B."""
     lines = [
-        f'Biến cố theo dõi: **A hoặc B của số giải bảy THỨ NHẤT có mặt trong 2 số cuối giải đặc biệt** '
-        f'(tỉ lệ {cycle.hit_rate:.1%} mỗi kỳ, đo trên toàn lịch sử).',
+        'Biến cố theo dõi: chữ số **A** (hàng chục) và **B** (hàng đơn vị) của số giải bảy '
+        'THỨ NHẤT có mặt trong 2 số cuối giải đặc biệt cùng kỳ.',
         '',
-        f'- Đang trượt liên tiếp: **{cycle.streak} kỳ**{flag} (lần trúng gần nhất: {last_hit})',
-        f'- Nhịp lịch sử giữa hai lần trúng: trung bình **{cycle.mean_gap:.1f} kỳ**, '
-        f'một nửa số lần chờ ≤ {cycle.median_gap:.0f} kỳ, 90% số lần chờ ≤ {cycle.p90_gap} kỳ, '
-        f'dài nhất từng ghi nhận {cycle.max_gap} kỳ',
-        f'- Ngưỡng cảnh báo: trượt **{cycle.alert_streak} kỳ liên tiếp** trở lên '
-        f'(chuỗi hiếm hơn {probability.UNUSUAL_RARITY:.0%} so với chu kỳ lịch sử)',
+        '| Biến cố | Tỉ lệ/kỳ | Lượt trúng | Đang trượt | TB cách | Trung vị | 90% ≤ | Dài nhất | Ngưỡng báo |',
+        '|:-------:|:--------:|:----------:|:----------:|:-------:|:--------:|:-----:|:--------:|:----------:|',
+    ]
+    for cycle in cycles:
+        flag = ' ⚠️' if cycle.unusual else ''
+        lines.append(
+            f'| **{cycle.name}**{flag} | {cycle.hit_rate:.1%} | {cycle.hits} | **{cycle.streak} kỳ** '
+            f'| {cycle.mean_gap:.1f} kỳ | {cycle.median_gap:.0f} | {cycle.p90_gap} | {cycle.max_gap} '
+            f'| {cycle.alert_streak} kỳ |'
+        )
+    ab = cycles[-1]
+    lines += [
+        '',
+        f'Ngưỡng của **A hoặc B** đặt ở mức báo sớm {ab.alert_streak} kỳ theo yêu cầu '
+        f'(độ hiếm {(1 - ab.hit_rate) ** ab.alert_streak:.1%} — sẽ kêu vài lần mỗi tháng); '
+        f'ngưỡng của A và B riêng lẻ theo mức hiếm 5%.',
     ]
     return '\n'.join(lines)
 
@@ -93,7 +101,7 @@ def build_report(
     last_date: pd.Timestamp,
     prize7_numbers: list[int] | None = None,
     prize7_statuses: list[probability.DigitStatus] | None = None,
-    cycle: probability.CycleStatus | None = None,
+    cycles: list[probability.CycleStatus] | None = None,
 ) -> str:
     unusual = [status for status in statuses if status.unusual]
 
@@ -121,15 +129,16 @@ def build_report(
         else:
             parts.append('Không chữ số nào trong giải bảy kỳ này đang vắng mặt bất thường.')
 
-    if cycle is not None:
-        parts += ['', '## Chu kỳ A/B của giải bảy thứ nhất', '', format_cycle(cycle)]
-        if cycle.unusual:
-            parts.append('')
-            parts.append(
-                f'Chuỗi trượt hiện tại **{cycle.streak} kỳ** đã vượt ngưỡng — dài hiếm thấy so với '
-                f'chu kỳ lịch sử. Điều đó KHÔNG làm kỳ tới dễ trúng hơn: xác suất kỳ tới vẫn là '
-                f'{cycle.hit_rate:.1%}.'
-            )
+    if cycles:
+        parts += ['', '## Chu kỳ A, B của giải bảy thứ nhất', '', format_cycles(cycles)]
+        for cycle in cycles:
+            if cycle.unusual:
+                parts.append('')
+                parts.append(
+                    f'Biến cố **{cycle.name}** đã trượt **{cycle.streak} kỳ** liên tiếp — chạm ngưỡng '
+                    f'{cycle.alert_streak} kỳ. Điều đó KHÔNG làm kỳ tới dễ trúng hơn: xác suất kỳ tới '
+                    f'vẫn là {cycle.hit_rate:.1%}.'
+                )
 
     parts += [
         '',
@@ -170,7 +179,7 @@ def main() -> int:
     statuses = probability.all_digit_statuses(results)
     unusual = [status for status in statuses if status.unusual]
     prize7_numbers, prize7_statuses = probability.prize7_digit_statuses(results)
-    cycle = probability.prize7_ab_cycle(results)
+    cycles = probability.prize7_cycles(results)
 
     print(f'Tình trạng chữ số ở 2 số cuối giải đặc biệt, tính tới {last_date:%d/%m/%Y}:')
     for status in statuses:
@@ -189,13 +198,15 @@ def main() -> int:
         print(f'  chữ số {status.digit}: vắng {status.streak:3d} kỳ | độ hiếm {status.rarity:7.2%}{mark}')
 
     print()
-    mark = '  <-- bất thường' if cycle.unusual else ''
-    print(
-        f'Chu kỳ A/B giải bảy 1: trượt {cycle.streak} kỳ liên tiếp | nhịp trung bình '
-        f'{cycle.mean_gap:.1f} kỳ | ngưỡng báo {cycle.alert_streak} kỳ{mark}'
-    )
+    print('Chu kỳ A, B của giải bảy 1 (so với 2 số cuối giải đặc biệt):')
+    for cycle in cycles:
+        mark = '  <-- chạm ngưỡng' if cycle.unusual else ''
+        print(
+            f'  {cycle.name}: trượt {cycle.streak} kỳ liên tiếp | nhịp TB {cycle.mean_gap:.1f} kỳ | '
+            f'lượt trúng {cycle.hits} | ngưỡng báo {cycle.alert_streak} kỳ{mark}'
+        )
 
-    report = build_report(statuses, last_date, prize7_numbers, prize7_statuses, cycle)
+    report = build_report(statuses, last_date, prize7_numbers, prize7_statuses, cycles)
 
     summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
     if summary_file:
@@ -205,7 +216,8 @@ def main() -> int:
     body_path = Path(os.environ.get('RUNNER_TEMP', tempfile.gettempdir())) / 'gan-alert.md'
     body_path.write_text(report, encoding='utf-8')
 
-    write_output('alert', 'true' if (unusual or cycle.unusual) else 'false')
+    cycle_alerts = [cycle for cycle in cycles if cycle.unusual]
+    write_output('alert', 'true' if (unusual or cycle_alerts) else 'false')
     write_output('title', ISSUE_TITLE)
     write_output('body_path', str(body_path))
 
@@ -213,9 +225,9 @@ def main() -> int:
     if unusual:
         digits = ', '.join(str(status.digit) for status in unusual)
         messages.append(f'Chữ số {digits} đang vắng mặt bất thường ở 2 số cuối giải đặc biệt')
-    if cycle.unusual:
+    for cycle in cycle_alerts:
         messages.append(
-            f'Chuỗi A/B giải bảy 1 đã trượt {cycle.streak} kỳ liên tiếp — vượt ngưỡng chu kỳ {cycle.alert_streak} kỳ'
+            f'Biến cố {cycle.name} của giải bảy 1 đã trượt {cycle.streak} kỳ liên tiếp — chạm ngưỡng {cycle.alert_streak} kỳ'
         )
     for message in messages:
         if os.environ.get('GITHUB_ACTIONS') == 'true':

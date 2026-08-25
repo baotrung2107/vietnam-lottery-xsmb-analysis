@@ -237,16 +237,18 @@ def test_prize7_digit_streak_is_measured_against_the_special_tail_not_prize7():
     assert five.last_seen == pd.Timestamp('2026-01-01').date()
 
 
-# --- chu kỳ A/B của giải bảy thứ nhất ---
+# --- chu kỳ A, B của giải bảy thứ nhất ---
 
 
-def test_prize7_ab_hits_checks_both_digits_against_the_tail():
+def test_a_and_b_hits_check_each_digit_separately():
     data = draws_with_prize7(
         [17, 80, 91, 55],
         [[19, 85, 40, 71], [91, 9, 45, 84], [19, 85, 40, 71], [23, 85, 40, 71]],
     )
-    # 17: G7=19 -> A=1 có trong {1,7} -> trúng | 80: G7=91 -> {9,1} vs {8,0} -> trượt
-    # 91: G7=19 -> {1,9} vs {9,1} -> trúng    | 55: G7=23 -> {2,3} vs {5,5} -> trượt
+    # 17: G7=19 -> A=1 trúng, B=9 trượt | 80: G7=91 -> A=9 trượt, B=1 trượt
+    # 91: G7=19 -> A=1 trúng, B=9 trúng | 55: G7=23 -> A=2 trượt, B=3 trượt
+    assert probability.prize7_a_hits(data).tolist() == [True, False, True, False]
+    assert probability.prize7_b_hits(data).tolist() == [False, False, True, False]
     assert probability.prize7_ab_hits(data).tolist() == [True, False, True, False]
 
 
@@ -259,27 +261,48 @@ def test_cycle_counts_the_current_miss_streak():
     assert not cycle.unusual
 
 
-def test_cycle_alert_threshold_is_the_smallest_rare_streak():
-    """Với tỉ lệ 35%, chuỗi trượt 7 kỳ là mức đầu tiên hiếm hơn 5% — không phải mức trung bình 2,9."""
-    data = draws_with_prize7([17, 80], [[19, 85, 40, 71]] * 2)
-    cycle = probability.prize7_ab_cycle(data, hit_rate=0.35)
-    assert cycle.alert_streak == 7
-    assert 0.65**7 < 0.05 <= 0.65**6
-
-
-def test_cycle_flags_a_streak_past_the_threshold():
-    specials = [17] + [80] * 7  # trúng kỳ đầu, rồi trượt 7 kỳ
+def test_ab_cycle_alerts_early_at_five_misses():
+    """Người dùng chọn báo sớm: A hoặc B trượt 5 kỳ là kêu, dù độ hiếm mới ~11,6%."""
+    specials = [17] + [80] * 5
     data = draws_with_prize7(specials, [[19, 85, 40, 71]] * len(specials))
     cycle = probability.prize7_ab_cycle(data, hit_rate=0.35)
-    assert cycle.streak == 7
+    assert cycle.alert_streak == 5
+    assert cycle.streak == 5
     assert cycle.unusual
 
 
-def test_cycle_on_the_real_dataset_matches_the_known_rhythm():
+def test_ab_cycle_stays_quiet_at_four_misses():
+    specials = [17] + [80] * 4
+    data = draws_with_prize7(specials, [[19, 85, 40, 71]] * len(specials))
+    assert not probability.prize7_ab_cycle(data, hit_rate=0.35).unusual
+
+
+def test_single_digit_cycles_keep_the_rarity_threshold():
+    """A và B riêng lẻ (19%/kỳ) vẫn theo mức hiếm 5% -> 15 kỳ, không ăn theo ngưỡng báo sớm 5."""
+    data = draws_with_prize7([17, 80], [[19, 85, 40, 71]] * 2)
+    assert probability.prize7_a_cycle(data, hit_rate=0.19).alert_streak == 15
+    assert probability.prize7_b_cycle(data, hit_rate=0.19).alert_streak == 15
+    assert probability.default_alert_streak(0.19) == 15
+    assert 0.81**15 < 0.05 <= 0.81**14
+
+
+def test_prize7_cycles_returns_a_b_then_combined():
+    data = draws_with_prize7([17, 80], [[19, 85, 40, 71]] * 2)
+    names = [cycle.name for cycle in probability.prize7_cycles(data)]
+    assert names == ['Chỉ A', 'Chỉ B', 'A hoặc B']
+
+
+def test_cycles_on_the_real_dataset_match_the_known_rhythm():
     data = pd.read_csv('data/xsmb.csv', parse_dates=['date'])
-    cycle = probability.prize7_ab_cycle(data)
-    assert cycle.hit_rate == pytest.approx(0.35, abs=0.02)
-    assert cycle.mean_gap == pytest.approx(2.86, abs=0.1)
-    assert cycle.max_gap >= 20
-    assert cycle.alert_streak == 7
-    assert cycle.rarity == pytest.approx((1 - cycle.hit_rate) ** cycle.streak)
+    a, b, ab = probability.prize7_cycles(data)
+
+    assert ab.hit_rate == pytest.approx(0.35, abs=0.02)
+    assert ab.mean_gap == pytest.approx(2.86, abs=0.1)
+    assert ab.alert_streak == 5
+
+    for single in (a, b):
+        assert single.hit_rate == pytest.approx(0.19, abs=0.01)
+        assert single.mean_gap == pytest.approx(5.2, abs=0.2)
+        assert single.alert_streak == 15
+        assert single.hits == pytest.approx(1448, abs=5)
+    assert a.hits + b.hits >= ab.hits  # A và B có thể cùng trúng một kỳ, biến cố gộp chỉ đếm 1

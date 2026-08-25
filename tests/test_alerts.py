@@ -115,33 +115,38 @@ def test_main_prints_the_prize7_digits(capsys, monkeypatch, tmp_path):
     assert 'Giải bảy kỳ mới nhất:' in capsys.readouterr().out
 
 
-def make_cycle(streak: int, unusual: bool) -> probability_cycle.CycleStatus:
+def make_cycle(name: str, streak: int, alert_streak: int) -> probability_cycle.CycleStatus:
     return probability_cycle.CycleStatus(
+        name=name,
         streak=streak,
         last_hit=pd.Timestamp('2026-08-24').date(),
+        hits=2634,
         hit_rate=0.35,
         mean_gap=2.9,
         median_gap=2.0,
         p90_gap=6,
         max_gap=21,
         rarity=0.65**streak,
-        unusual=unusual,
+        alert_streak=alert_streak,
+        unusual=streak >= alert_streak,
     )
 
 
-def test_report_includes_the_cycle_section_when_given_one():
-    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), cycle=make_cycle(1, False))
-    assert 'Chu kỳ A/B của giải bảy thứ nhất' in report
-    assert 'trung bình **2.9 kỳ**' in report
-    assert 'trượt **7 kỳ liên tiếp** trở lên' in report
+def test_report_includes_the_cycle_table_when_given_cycles():
+    cycles = [make_cycle('Chỉ A', 1, 15), make_cycle('Chỉ B', 2, 15), make_cycle('A hoặc B', 1, 5)]
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), cycles=cycles)
+    assert 'Chu kỳ A, B của giải bảy thứ nhất' in report
+    assert '**Chỉ A** | 35.0% | 2634' in report
+    assert 'mức báo sớm 5 kỳ' in report
 
 
-def test_cycle_past_the_threshold_adds_the_warning_and_the_honest_caveat():
-    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), cycle=make_cycle(8, True))
-    assert 'đã vượt ngưỡng' in report
+def test_cycle_at_the_threshold_adds_the_warning_and_the_honest_caveat():
+    cycles = [make_cycle('A hoặc B', 5, 5)]
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), cycles=cycles)
+    assert 'đã trượt **5 kỳ** liên tiếp — chạm ngưỡng 5 kỳ' in report
     assert 'KHÔNG làm kỳ tới dễ trúng hơn' in report
 
 
 def test_report_omits_the_cycle_section_when_not_given():
     report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'))
-    assert 'Chu kỳ A/B' not in report
+    assert 'Chu kỳ A, B' not in report
