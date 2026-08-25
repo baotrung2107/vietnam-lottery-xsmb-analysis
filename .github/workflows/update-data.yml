@@ -5,9 +5,16 @@ on:
   schedule:
     - cron: 35 11 * * * # 6:35 PM in Vietnam
 
+permissions:
+  contents: write
+
+# Một lần bấm tay trùng giờ cron sẽ làm hai lần chạy cùng ghi vào main và đẩy nhau ra.
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
 jobs:
   update-data:
-    if: github.repository_owner == 'khiemdoan'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo content
@@ -29,13 +36,16 @@ jobs:
 
       - name: Commit changes
         run: |
-          if git diff --quiet; then
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+          # add trước rồi mới kiểm: `git diff` không nhìn thấy file mới chưa được theo dõi.
+          git add -A
+          if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add .
           git commit -m "Updated $(date +'%Y-%m-%d')"
+          git pull --rebase origin main
           git push origin main
