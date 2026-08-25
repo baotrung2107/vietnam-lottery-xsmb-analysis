@@ -235,3 +235,51 @@ def test_prize7_digit_streak_is_measured_against_the_special_tail_not_prize7():
     five = next(status for status in statuses if status.digit == 5)
     assert five.streak == 3
     assert five.last_seen == pd.Timestamp('2026-01-01').date()
+
+
+# --- chu kỳ A/B của giải bảy thứ nhất ---
+
+
+def test_prize7_ab_hits_checks_both_digits_against_the_tail():
+    data = draws_with_prize7(
+        [17, 80, 91, 55],
+        [[19, 85, 40, 71], [91, 9, 45, 84], [19, 85, 40, 71], [23, 85, 40, 71]],
+    )
+    # 17: G7=19 -> A=1 có trong {1,7} -> trúng | 80: G7=91 -> {9,1} vs {8,0} -> trượt
+    # 91: G7=19 -> {1,9} vs {9,1} -> trúng    | 55: G7=23 -> {2,3} vs {5,5} -> trượt
+    assert probability.prize7_ab_hits(data).tolist() == [True, False, True, False]
+
+
+def test_cycle_counts_the_current_miss_streak():
+    data = draws_with_prize7([17, 80, 55], [[19, 85, 40, 71]] * 3)
+    cycle = probability.prize7_ab_cycle(data, hit_rate=0.35)
+    assert cycle.streak == 2
+    assert cycle.last_hit == pd.Timestamp('2026-01-01').date()
+    assert cycle.rarity == pytest.approx(0.65**2)
+    assert not cycle.unusual
+
+
+def test_cycle_alert_threshold_is_the_smallest_rare_streak():
+    """Với tỉ lệ 35%, chuỗi trượt 7 kỳ là mức đầu tiên hiếm hơn 5% — không phải mức trung bình 2,9."""
+    data = draws_with_prize7([17, 80], [[19, 85, 40, 71]] * 2)
+    cycle = probability.prize7_ab_cycle(data, hit_rate=0.35)
+    assert cycle.alert_streak == 7
+    assert 0.65**7 < 0.05 <= 0.65**6
+
+
+def test_cycle_flags_a_streak_past_the_threshold():
+    specials = [17] + [80] * 7  # trúng kỳ đầu, rồi trượt 7 kỳ
+    data = draws_with_prize7(specials, [[19, 85, 40, 71]] * len(specials))
+    cycle = probability.prize7_ab_cycle(data, hit_rate=0.35)
+    assert cycle.streak == 7
+    assert cycle.unusual
+
+
+def test_cycle_on_the_real_dataset_matches_the_known_rhythm():
+    data = pd.read_csv('data/xsmb.csv', parse_dates=['date'])
+    cycle = probability.prize7_ab_cycle(data)
+    assert cycle.hit_rate == pytest.approx(0.35, abs=0.02)
+    assert cycle.mean_gap == pytest.approx(2.86, abs=0.1)
+    assert cycle.max_gap >= 20
+    assert cycle.alert_streak == 7
+    assert cycle.rarity == pytest.approx((1 - cycle.hit_rate) ** cycle.streak)

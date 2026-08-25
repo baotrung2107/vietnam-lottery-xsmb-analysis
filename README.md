@@ -85,6 +85,16 @@ Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ l
 | 0 | 0 kỳ | 25-08-2026 | 100.00% |
 | 8 | 0 kỳ | 25-08-2026 | 100.00% |
 
+  <h3>Chu kỳ A/B của giải bảy thứ nhất</h3>
+
+Biến cố: A hoặc B của số giải bảy **thứ nhất** có mặt trong 2 số cuối giải đặc biệt cùng kỳ (tỉ lệ 35.0% mỗi kỳ).
+
+- Đang trượt liên tiếp: **1 kỳ** (lần trúng gần nhất: 24-08-2026)
+- Nhịp lịch sử giữa hai lần trúng: trung bình **2.9 kỳ**, một nửa số lần chờ ≤ 2 kỳ, 90% ≤ 6 kỳ, dài nhất từng ghi nhận 21 kỳ
+- Ngưỡng cảnh báo: trượt **7 kỳ liên tiếp** trở lên — mức hiếm so với chu kỳ lịch sử, không phải mức trung bình
+
+Vượt ngưỡng nghĩa là chuỗi chờ đã dài hiếm thấy so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn: xác suất kỳ tới vẫn là 35.0%.
+
   <h3>Xác suất cho 7 kỳ tới (đúng cho mọi chữ số)</h3>
 
 | Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |

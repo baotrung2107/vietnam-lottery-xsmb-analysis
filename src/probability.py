@@ -23,6 +23,7 @@ __email__ = 'doankhiem.crazy@gmail.com'
 from datetime import date
 from typing import NamedTuple
 
+import numpy as np
 import pandas as pd
 
 # Mỗi chữ số 0-9 nằm trong đúng 19 số hai chữ số: 10 số ở hàng chục cộng 10 số ở hàng đơn vị,
@@ -145,3 +146,72 @@ def prize7_digit_statuses(
     numbers = latest_prize7(results)
     statuses = [digit_status(results, digit, unusual_rarity) for digit in distinct_digits(numbers)]
     return numbers, sorted(statuses, key=lambda status: -status.streak)
+
+
+def prize7_ab_hits(results: pd.DataFrame) -> pd.Series:
+    """Chuỗi trúng/trượt theo kỳ: A hoặc B của số GIẢI BẢY THỨ NHẤT có mặt trong 2 số cuối giải đặc biệt."""
+    tails = results['special'] % 100
+    first = results['prize7_1'] % 100
+    tens, ones = tails // 10, tails % 10
+    a, b = first // 10, first % 10
+    return (a == tens) | (a == ones) | (b == tens) | (b == ones)
+
+
+class CycleStatus(NamedTuple):
+    streak: int  # số kỳ trượt liên tiếp tính tới kỳ mới nhất
+    last_hit: date | None
+    hit_rate: float  # tỉ lệ trúng đo trên toàn lịch sử
+    mean_gap: float  # trung bình cách bao nhiêu kỳ giữa hai lần trúng
+    median_gap: float
+    p90_gap: int  # 90% các lần chờ đều ngắn hơn hoặc bằng mức này
+    max_gap: int  # lần chờ dài nhất từng ghi nhận
+    rarity: float  # khả năng một chuỗi trượt dài bằng chừng này, tính từ điểm bất kỳ
+    unusual: bool
+
+    @property
+    def alert_streak(self) -> int:
+        """Chuỗi trượt ngắn nhất bị coi là bất thường với hit_rate hiện tại."""
+        streak = 0
+        while (1 - self.hit_rate) ** streak >= UNUSUAL_RARITY:
+            streak += 1
+        return streak
+
+
+def prize7_ab_cycle(
+    results: pd.DataFrame, unusual_rarity: float = UNUSUAL_RARITY, hit_rate: float | None = None
+) -> CycleStatus:
+    """Chu kỳ xuất hiện của biến cố A/B giải bảy thứ nhất, và chuỗi trượt đang chạy.
+
+    Ngưỡng cảnh báo KHÔNG đặt ở mức trung bình (vượt trung bình là chuyện thường ngày) mà ở mức
+    hiếm: chuỗi trượt dài tới độ chỉ xuất hiện dưới `unusual_rarity` khả năng. Cảnh báo mô tả
+    chuyện đã xảy ra là hiếm so với chu kỳ lịch sử — xác suất kỳ tới vẫn bằng hit_rate, không đổi.
+    """
+    hits = prize7_ab_hits(results).to_numpy()
+    dates = results['date'].to_numpy()
+
+    streak = 0
+    last_hit = None
+    for index in range(len(hits) - 1, -1, -1):
+        if hits[index]:
+            last_hit = pd.Timestamp(dates[index]).date()
+            break
+        streak += 1
+
+    if hit_rate is None:
+        hit_rate = float(hits.mean())
+
+    positions = np.flatnonzero(hits)
+    gaps = np.diff(positions) if len(positions) > 1 else np.array([1])
+
+    rarity = (1 - hit_rate) ** streak
+    return CycleStatus(
+        streak=streak,
+        last_hit=last_hit,
+        hit_rate=hit_rate,
+        mean_gap=float(gaps.mean()),
+        median_gap=float(np.median(gaps)),
+        p90_gap=int(np.percentile(gaps, 90)),
+        max_gap=int(gaps.max()),
+        rarity=rarity,
+        unusual=rarity < unusual_rarity,
+    )

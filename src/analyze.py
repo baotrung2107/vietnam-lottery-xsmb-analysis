@@ -11,8 +11,8 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 
+import probability
 from lottery import Lottery
-from probability import DIGIT_HIT_PROBABILITY, all_digit_statuses, expected_wait, forecast, prize7_digit_statuses
 from templates import Render
 
 # Số kỳ tới hiển thị trong bảng dự báo của README.
@@ -148,17 +148,19 @@ if __name__ == '__main__':
     mean = counts.mean().round(2)
     std = counts.std().round(2)
 
-    prize7_numbers, prize7_statuses = prize7_digit_statuses(results)
+    prize7_numbers, prize7_statuses = probability.prize7_digit_statuses(results)
+    ab_cycle = probability.prize7_ab_cycle(results)
 
     render = Render()
     context = {
         'repo': detect_repo(),
         'prize7_numbers': prize7_numbers,
         'prize7_statuses': prize7_statuses,
-        'digit_statuses': all_digit_statuses(results),
-        'digit_forecast': forecast(FORECAST_DRAWS),
-        'hit_probability': DIGIT_HIT_PROBABILITY,
-        'expected_wait': expected_wait(),
+        'ab_cycle': ab_cycle,
+        'digit_statuses': probability.all_digit_statuses(results),
+        'digit_forecast': probability.forecast(FORECAST_DRAWS),
+        'hit_probability': probability.DIGIT_HIT_PROBABILITY,
+        'expected_wait': probability.expected_wait(),
         'loto_result': loto_result,
         'max_count': max_count,
         'min_count': min_count,

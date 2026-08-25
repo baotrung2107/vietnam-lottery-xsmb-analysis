@@ -75,6 +75,16 @@ Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ l
 | {{ status.digit }}{% if status.unusual %} :warning:{% endif %} | {{ status.streak }} kỳ | {% if status.last_seen %}{{ status.last_seen.strftime('%d-%m-%Y') }}{% else %}chưa từng{% endif %} | {{ '{:.2%}'.format(status.rarity) }} |
 {%- endfor %}
 
+  <h3>Chu kỳ A/B của giải bảy thứ nhất</h3>
+
+Biến cố: A hoặc B của số giải bảy **thứ nhất** có mặt trong 2 số cuối giải đặc biệt cùng kỳ (tỉ lệ {{ '{:.1%}'.format(ab_cycle.hit_rate) }} mỗi kỳ).
+
+- Đang trượt liên tiếp: **{{ ab_cycle.streak }} kỳ**{% if ab_cycle.unusual %} :warning:{% endif %} (lần trúng gần nhất: {% if ab_cycle.last_hit %}{{ ab_cycle.last_hit.strftime('%d-%m-%Y') }}{% else %}chưa từng{% endif %})
+- Nhịp lịch sử giữa hai lần trúng: trung bình **{{ '{:.1f}'.format(ab_cycle.mean_gap) }} kỳ**, một nửa số lần chờ ≤ {{ '{:.0f}'.format(ab_cycle.median_gap) }} kỳ, 90% ≤ {{ ab_cycle.p90_gap }} kỳ, dài nhất từng ghi nhận {{ ab_cycle.max_gap }} kỳ
+- Ngưỡng cảnh báo: trượt **{{ ab_cycle.alert_streak }} kỳ liên tiếp** trở lên — mức hiếm so với chu kỳ lịch sử, không phải mức trung bình
+
+Vượt ngưỡng nghĩa là chuỗi chờ đã dài hiếm thấy so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn: xác suất kỳ tới vẫn là {{ '{:.1%}'.format(ab_cycle.hit_rate) }}.
+
   <h3>Xác suất cho {{ digit_forecast | length }} kỳ tới (đúng cho mọi chữ số)</h3>
 
 | Kỳ tới | Trúng đúng kỳ này (lần đầu) | Đã trúng ít nhất một lần |

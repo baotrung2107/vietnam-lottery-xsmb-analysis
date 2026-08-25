@@ -1,6 +1,7 @@
 import pandas as pd
 
 import alerts
+import probability as probability_cycle
 from probability import DigitStatus, probability_none
 
 QUIET = DigitStatus(
@@ -112,3 +113,35 @@ def test_main_prints_the_prize7_digits(capsys, monkeypatch, tmp_path):
     monkeypatch.delenv('GITHUB_STEP_SUMMARY', raising=False)
     alerts.main()
     assert 'Giải bảy kỳ mới nhất:' in capsys.readouterr().out
+
+
+def make_cycle(streak: int, unusual: bool) -> probability_cycle.CycleStatus:
+    return probability_cycle.CycleStatus(
+        streak=streak,
+        last_hit=pd.Timestamp('2026-08-24').date(),
+        hit_rate=0.35,
+        mean_gap=2.9,
+        median_gap=2.0,
+        p90_gap=6,
+        max_gap=21,
+        rarity=0.65**streak,
+        unusual=unusual,
+    )
+
+
+def test_report_includes_the_cycle_section_when_given_one():
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), cycle=make_cycle(1, False))
+    assert 'Chu kỳ A/B của giải bảy thứ nhất' in report
+    assert 'trung bình **2.9 kỳ**' in report
+    assert 'trượt **7 kỳ liên tiếp** trở lên' in report
+
+
+def test_cycle_past_the_threshold_adds_the_warning_and_the_honest_caveat():
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), cycle=make_cycle(8, True))
+    assert 'đã vượt ngưỡng' in report
+    assert 'KHÔNG làm kỳ tới dễ trúng hơn' in report
+
+
+def test_report_omits_the_cycle_section_when_not_given():
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'))
+    assert 'Chu kỳ A/B' not in report
