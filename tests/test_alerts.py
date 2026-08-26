@@ -150,3 +150,32 @@ def test_cycle_at_the_threshold_adds_the_warning_and_the_honest_caveat():
 def test_report_omits_the_cycle_section_when_not_given():
     report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'))
     assert 'Chu kỳ A, B' not in report
+
+
+def make_break(kind: str, label: str, missed: int, rarity: float) -> probability_cycle.DroughtBreak:
+    return probability_cycle.DroughtBreak(
+        kind=kind,
+        label=label,
+        missed=missed,
+        rarity=rarity,
+        previous_seen=pd.Timestamp('2026-08-05').date(),
+        returned=pd.Timestamp('2026-08-25').date(),
+    )
+
+
+def test_report_lists_the_drought_breaks():
+    breaks = [make_break('chữ số', '0', 19, 0.018)]
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), breaks=breaks)
+    assert 'Số khan vừa về kỳ này' in report
+    assert 'chữ số **0** ⚠️ | 19 kỳ' in report
+    assert 'không làm số vừa về dễ hay khó ra hơn' in report
+
+
+def test_report_says_when_no_drought_break_happened():
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'), breaks=[])
+    assert 'không có số khan nào vừa về' in report
+
+
+def test_report_omits_the_break_section_when_not_given():
+    report = alerts.build_report([NORMAL], pd.Timestamp('2026-08-25'))
+    assert 'Số khan vừa về' not in report

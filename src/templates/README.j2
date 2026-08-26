@@ -57,6 +57,18 @@ df.info()
 
 Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác suất mỗi kỳ luôn là **{{ '{:.0%}'.format(hit_probability) }}** cho cả mười chữ số, và **không đổi** theo chuỗi vắng mặt. Trung bình phải chờ {{ '{:.1f}'.format(expected_wait) }} kỳ mới có một lần, tính từ kỳ mới nhất chứ không tính ngược lại.
 
+  <h3>Số khan vừa về kỳ này</h3>
+
+{% if khan_breaks %}| Vừa về | Vắng trước đó | Lần cuối trước chuỗi | Độ hiếm của chuỗi vừa dứt |
+|:------:|:-------------:|:--------------------:|:-------------------------:|
+{%- for item in khan_breaks %}
+| {{ item.kind }} **{{ item.label }}**{% if item.rarity < 0.05 %} :warning:{% endif %} | {{ item.missed }} kỳ | {% if item.previous_seen %}{{ item.previous_seen.strftime('%d-%m-%Y') }}{% else %}chưa từng{% endif %} | {{ '{:.1%}'.format(item.rarity) }} |
+{%- endfor %}
+
+Chuỗi khan đã kết thúc — bảng tổng kết quá khứ, không làm số vừa về dễ hay khó ra hơn ở kỳ tới.
+{% else %}Kỳ này không có số khan nào vừa về (ngưỡng: chữ số vắng ≥ 10 kỳ, con số vắng ≥ 230 kỳ).
+{% endif %}
+
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
 {%- for status in digit_statuses %}

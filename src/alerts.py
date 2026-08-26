@@ -96,12 +96,32 @@ def format_cycles(cycles: list[probability.CycleStatus]) -> str:
     return '\n'.join(lines)
 
 
+def format_breaks(breaks: list[probability.DroughtBreak]) -> str:
+    """Mục "số khan vừa về": các chuỗi vắng dài vừa kết thúc ở kỳ mới nhất."""
+    if not breaks:
+        return 'Kỳ này không có số khan nào vừa về (ngưỡng: chữ số vắng ≥ 10 kỳ, con số vắng ≥ 230 kỳ).'
+    lines = [
+        '| Vừa về | Vắng trước đó | Lần cuối trước chuỗi | Độ hiếm của chuỗi vừa dứt |',
+        '|:------:|:-------------:|:--------------------:|:-------------------------:|',
+    ]
+    for item in breaks:
+        previous = f'{item.previous_seen:%d/%m/%Y}' if item.previous_seen else 'chưa từng'
+        flag = ' ⚠️' if item.rarity < probability.UNUSUAL_RARITY else ''
+        lines.append(f'| {item.kind} **{item.label}**{flag} | {item.missed} kỳ | {previous} | {item.rarity:.1%} |')
+    lines += [
+        '',
+        'Chuỗi khan đã KẾT THÚC — bảng này tổng kết quá khứ. Nó không làm số vừa về dễ hay khó ra hơn ở các kỳ tới.',
+    ]
+    return '\n'.join(lines)
+
+
 def build_report(
     statuses: list[probability.DigitStatus],
     last_date: pd.Timestamp,
     prize7_numbers: list[int] | None = None,
     prize7_statuses: list[probability.DigitStatus] | None = None,
     cycles: list[probability.CycleStatus] | None = None,
+    breaks: list[probability.DroughtBreak] | None = None,
 ) -> str:
     unusual = [status for status in statuses if status.unusual]
 
@@ -128,6 +148,9 @@ def build_report(
             parts.append(f'Trong đó chữ số **{digits}** đang vắng mặt bất thường.')
         else:
             parts.append('Không chữ số nào trong giải bảy kỳ này đang vắng mặt bất thường.')
+
+    if breaks is not None:
+        parts += ['', '## Số khan vừa về kỳ này', '', format_breaks(breaks)]
 
     if cycles:
         parts += ['', '## Chu kỳ A, B của giải bảy thứ nhất', '', format_cycles(cycles)]
@@ -180,6 +203,7 @@ def main() -> int:
     unusual = [status for status in statuses if status.unusual]
     prize7_numbers, prize7_statuses = probability.prize7_digit_statuses(results)
     cycles = probability.prize7_cycles(results)
+    breaks = probability.drought_breaks(results)
 
     print(f'Tình trạng chữ số ở 2 số cuối giải đặc biệt, tính tới {last_date:%d/%m/%Y}:')
     for status in statuses:
@@ -206,7 +230,15 @@ def main() -> int:
             f'lượt trúng {cycle.hits} | ngưỡng báo {cycle.alert_streak} kỳ{mark}'
         )
 
-    report = build_report(statuses, last_date, prize7_numbers, prize7_statuses, cycles)
+    print()
+    if breaks:
+        print('Số khan vừa về kỳ này:')
+        for item in breaks:
+            print(f'  {item.kind} {item.label}: về sau {item.missed} kỳ vắng (độ hiếm {item.rarity:.1%})')
+    else:
+        print('Số khan vừa về kỳ này: không có')
+
+    report = build_report(statuses, last_date, prize7_numbers, prize7_statuses, cycles, breaks)
 
     summary_file = os.environ.get('GITHUB_STEP_SUMMARY')
     if summary_file:
@@ -217,7 +249,8 @@ def main() -> int:
     body_path.write_text(report, encoding='utf-8')
 
     cycle_alerts = [cycle for cycle in cycles if cycle.unusual]
-    write_output('alert', 'true' if (unusual or cycle_alerts) else 'false')
+    rare_breaks = [item for item in breaks if item.rarity < probability.UNUSUAL_RARITY]
+    write_output('alert', 'true' if (unusual or cycle_alerts or rare_breaks) else 'false')
     write_output('title', ISSUE_TITLE)
     write_output('body_path', str(body_path))
 
@@ -225,6 +258,8 @@ def main() -> int:
     if unusual:
         digits = ', '.join(str(status.digit) for status in unusual)
         messages.append(f'Chữ số {digits} đang vắng mặt bất thường ở 2 số cuối giải đặc biệt')
+    for item in rare_breaks:
+        messages.append(f'{item.kind} {item.label} vừa về sau chuỗi khan {item.missed} kỳ (độ hiếm {item.rarity:.1%})')
     for cycle in cycle_alerts:
         messages.append(
             f'Biến cố {cycle.name} của giải bảy 1 đã trượt {cycle.streak} kỳ liên tiếp — chạm ngưỡng {cycle.alert_streak} kỳ'

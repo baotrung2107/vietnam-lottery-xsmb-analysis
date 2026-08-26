@@ -150,6 +150,7 @@ if __name__ == '__main__':
 
     prize7_numbers, prize7_statuses = probability.prize7_digit_statuses(results)
     ab_cycles = probability.prize7_cycles(results)
+    khan_breaks = probability.drought_breaks(results)
 
     render = Render()
     context = {
@@ -157,6 +158,7 @@ if __name__ == '__main__':
         'prize7_numbers': prize7_numbers,
         'prize7_statuses': prize7_statuses,
         'ab_cycles': ab_cycles,
+        'khan_breaks': khan_breaks,
         'digit_statuses': probability.all_digit_statuses(results),
         'digit_forecast': probability.forecast(FORECAST_DRAWS),
         'hit_probability': probability.DIGIT_HIT_PROBABILITY,

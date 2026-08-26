@@ -285,3 +285,74 @@ def prize7_b_cycle(
 def prize7_cycles(results: pd.DataFrame) -> list[CycleStatus]:
     """Cả ba chu kỳ để hiển thị chung một bảng: A, B, và A hoặc B."""
     return [prize7_a_cycle(results), prize7_b_cycle(results), prize7_ab_cycle(results)]
+
+
+# "Khan" định nghĩa theo nhịp chờ của chính loại biến cố: vắng dài hơn 90% các lần chờ lịch sử.
+# Chữ số trong XY (19%/kỳ): p90 ≈ 10 kỳ. Một số 00-99 cụ thể (1%/kỳ): p90 ≈ 230 kỳ.
+DIGIT_BREAK_STREAK = 10
+NUMBER_BREAK_STREAK = 230
+NUMBER_HIT_PROBABILITY = 0.01
+
+
+class DroughtBreak(NamedTuple):
+    kind: str  # 'chữ số' hoặc 'số'
+    label: str
+    missed: int  # số kỳ vắng ngay trước khi về lại
+    rarity: float  # độ hiếm của chuỗi vắng đó
+    previous_seen: date | None  # lần xuất hiện gần nhất trước chuỗi vắng
+    returned: date  # ngày về lại
+
+
+def drought_breaks(
+    results: pd.DataFrame,
+    digit_streak: int = DIGIT_BREAK_STREAK,
+    number_streak: int = NUMBER_BREAK_STREAK,
+) -> list[DroughtBreak]:
+    """Các số khan vừa về ở kỳ MỚI NHẤT: chữ số và con số XY kết thúc một chuỗi vắng dài.
+
+    Chạy sau khi dữ liệu ngày mới đã vào kho, nên "kỳ mới nhất" chính là kỳ vừa quay xong.
+    Báo cáo mô tả chuỗi vắng vừa kết thúc — nó không nói gì về các kỳ sắp tới.
+    """
+    tails = (results['special'] % 100).to_numpy()
+    dates = results['date'].to_numpy()
+    today_index = len(tails) - 1
+    today_tail = int(tails[today_index])
+    returned = pd.Timestamp(dates[today_index]).date()
+
+    breaks: list[DroughtBreak] = []
+
+    for digit in sorted({today_tail // 10, today_tail % 10}):
+        missed = 0
+        previous_seen = None
+        for index in range(today_index - 1, -1, -1):
+            if str(digit) in f'{tails[index]:02d}':
+                previous_seen = pd.Timestamp(dates[index]).date()
+                break
+            missed += 1
+        if missed >= digit_streak:
+            breaks.append(
+                DroughtBreak(
+                    kind='chữ số',
+                    label=str(digit),
+                    missed=missed,
+                    rarity=(1 - DIGIT_HIT_PROBABILITY) ** missed,
+                    previous_seen=previous_seen,
+                    returned=returned,
+                )
+            )
+
+    previous = np.flatnonzero(tails[:today_index] == today_tail)
+    missed = today_index - int(previous[-1]) - 1 if len(previous) else today_index
+    if missed >= number_streak:
+        breaks.append(
+            DroughtBreak(
+                kind='số',
+                label=f'{today_tail:02d}',
+                missed=missed,
+                rarity=(1 - NUMBER_HIT_PROBABILITY) ** missed,
+                previous_seen=pd.Timestamp(dates[int(previous[-1])]).date() if len(previous) else None,
+                returned=returned,
+            )
+        )
+
+    return sorted(breaks, key=lambda item: item.rarity)

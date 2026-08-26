@@ -306,3 +306,57 @@ def test_cycles_on_the_real_dataset_match_the_known_rhythm():
         assert single.alert_streak == 15
         assert single.hits == pytest.approx(1448, abs=5)
     assert a.hits + b.hits >= ab.hits  # A và B có thể cùng trúng một kỳ, biến cố gộp chỉ đếm 1
+
+
+# --- số khan vừa về ---
+
+
+def draws_full(specials: list[int]) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            'date': pd.date_range('2026-01-01', periods=len(specials), freq='D'),
+            'special': specials,
+            **{f'prize7_{i}': [11] * len(specials) for i in range(1, 5)},
+        }
+    )
+
+
+def test_digit_returning_after_a_long_absence_is_reported():
+    # chữ số 5 về ở kỳ cuối sau 11 kỳ vắng
+    data = draws_full([57] + [80, 22, 33, 44, 66, 77, 88, 99, 11, 20, 33] + [15])
+    breaks = probability.drought_breaks(data, digit_streak=10)
+    labels = {(item.kind, item.label): item for item in breaks}
+    five = labels[('chữ số', '5')]
+    assert five.missed == 11
+    assert five.previous_seen == pd.Timestamp('2026-01-01').date()
+    assert five.rarity == pytest.approx(0.81**11)
+
+
+def test_short_absences_are_not_reported():
+    data = draws_full([57, 80, 15])  # 5 chỉ vắng 1 kỳ
+    assert probability.drought_breaks(data) == []
+
+
+def test_number_returning_after_a_long_absence_is_reported():
+    specials = [80] + [11] * 240 + [80]
+    breaks = probability.drought_breaks(draws_full(specials), digit_streak=10**9, number_streak=230)
+    assert len(breaks) == 1
+    item = breaks[0]
+    assert (item.kind, item.label, item.missed) == ('số', '80', 240)
+    assert item.rarity == pytest.approx(0.99**240)
+
+
+def test_number_never_seen_before_counts_from_the_start():
+    specials = [11] * 250 + [80]
+    breaks = probability.drought_breaks(draws_full(specials), digit_streak=10**9, number_streak=230)
+    assert len(breaks) == 1
+    assert breaks[0].previous_seen is None
+    assert breaks[0].missed == 250
+
+
+def test_breaks_are_sorted_rarest_first():
+    specials = [57, 80] + [22, 33, 44, 66, 22, 33, 44, 66, 22, 33, 44, 66] + [50]
+    # cùng về ở kỳ cuối XY=50: chữ số 5 vắng 13 kỳ (hiếm hơn), chữ số 0 vắng 12 kỳ
+    breaks = probability.drought_breaks(draws_full(specials), digit_streak=10)
+    assert [item.label for item in breaks] == ['5', '0']
+    assert [item.missed for item in breaks] == [13, 12]
