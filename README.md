@@ -10,7 +10,7 @@ Dự án này được tạo bởi [Khiêm Đoàn](https://github.com/khiemdoan)
 
 | Lottery (Xổ số) | Loto (Lô tô) |
 | :------------: | :----------: |
-| <table><tr><td>Date (Ngày)</td><td>11-09-2026</td></tr><tr><td>Special (Giải đặc biệt)</td><td>29352</td></tr><tr><td>First (Giải nhất)</td><td>76083</td></tr><tr><td>Second (Giải nhì)</td><td>08590, 75553</td></tr><tr><td rowspan="2">Third (Giải ba)</td><td>88200, 79039, 18954</td></tr><tr><td>69147, 63705, 52097</td></tr><tr><td>Fourth (Giải tư)</td><td>3999, 8383, 3002, 5031</td></tr><tr><td rowspan="2">Fifth (Giải năm)</td><td>2110, 3571, 3864</td></tr><tr><td>5633, 0008, 2974</td></tr><tr><td>Sixth (Giải sáu)</td><td>827, 083, 875</td></tr><tr><td>Seventh (Giải bảy)</td><td>00, 41, 89, 12</td></tr></table> | <table><tr><td>First (Đầu)</td><td>Last (Đuôi)</td></tr><tr><td>0</td><td>0, 0, 2, 5, 8</td></tr><tr><td>1</td><td>0, 2</td></tr><tr><td>2</td><td>7</td></tr><tr><td>3</td><td>1, 3, 9</td></tr><tr><td>4</td><td>1, 7</td></tr><tr><td>5</td><td>2, 3, 4</td></tr><tr><td>6</td><td>4</td></tr><tr><td>7</td><td>1, 4, 5</td></tr><tr><td>8</td><td>3, 3, 3, 9</td></tr><tr><td>9</td><td>0, 7, 9</td></tr></table> |
+| <table><tr><td>Date (Ngày)</td><td>12-09-2026</td></tr><tr><td>Special (Giải đặc biệt)</td><td>58851</td></tr><tr><td>First (Giải nhất)</td><td>93635</td></tr><tr><td>Second (Giải nhì)</td><td>62249, 19402</td></tr><tr><td rowspan="2">Third (Giải ba)</td><td>15181, 68352, 76599</td></tr><tr><td>77021, 54082, 85899</td></tr><tr><td>Fourth (Giải tư)</td><td>5804, 9984, 3399, 1827</td></tr><tr><td rowspan="2">Fifth (Giải năm)</td><td>2462, 9390, 4742</td></tr><tr><td>1298, 8565, 6114</td></tr><tr><td>Sixth (Giải sáu)</td><td>119, 998, 793</td></tr><tr><td>Seventh (Giải bảy)</td><td>01, 39, 43, 23</td></tr></table> | <table><tr><td>First (Đầu)</td><td>Last (Đuôi)</td></tr><tr><td>0</td><td>1, 2, 4</td></tr><tr><td>1</td><td>4, 9</td></tr><tr><td>2</td><td>1, 3, 7</td></tr><tr><td>3</td><td>5, 9</td></tr><tr><td>4</td><td>2, 3, 9</td></tr><tr><td>5</td><td>1, 2</td></tr><tr><td>6</td><td>2, 5</td></tr><tr><td>7</td><td>-</td></tr><tr><td>8</td><td>1, 2, 4</td></tr><tr><td>9</td><td>0, 3, 8, 8, 9, 9, 9</td></tr></table> |
 
 ## Data (Dữ liệu)
 
@@ -64,31 +64,31 @@ Kỳ này không có số khan nào vừa về (ngưỡng: chữ số vắng ≥
 
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
-| 6 | 7 kỳ | 04-09-2026 | 22.88% |
-| 3 | 5 kỳ | 06-09-2026 | 34.87% |
-| 9 | 4 kỳ | 07-09-2026 | 43.05% |
-| 7 | 3 kỳ | 08-09-2026 | 53.14% |
-| 0 | 2 kỳ | 09-09-2026 | 65.61% |
-| 4 | 2 kỳ | 09-09-2026 | 65.61% |
-| 1 | 1 kỳ | 10-09-2026 | 81.00% |
-| 8 | 1 kỳ | 10-09-2026 | 81.00% |
-| 2 | 0 kỳ | 11-09-2026 | 100.00% |
-| 5 | 0 kỳ | 11-09-2026 | 100.00% |
+| 6 | 8 kỳ | 04-09-2026 | 18.53% |
+| 3 | 6 kỳ | 06-09-2026 | 28.24% |
+| 9 | 5 kỳ | 07-09-2026 | 34.87% |
+| 7 | 4 kỳ | 08-09-2026 | 43.05% |
+| 0 | 3 kỳ | 09-09-2026 | 53.14% |
+| 4 | 3 kỳ | 09-09-2026 | 53.14% |
+| 8 | 2 kỳ | 10-09-2026 | 65.61% |
+| 2 | 1 kỳ | 11-09-2026 | 81.00% |
+| 1 | 0 kỳ | 12-09-2026 | 100.00% |
+| 5 | 0 kỳ | 12-09-2026 | 100.00% |
 
   <h3>Chữ số của giải bảy kỳ mới nhất</h3>
 
-Giải bảy kỳ này: `00`, `41`, `89`, `12` — gồm các chữ số **0**, **1**, **2**, **4**, **8**, **9**.
+Giải bảy kỳ này: `01`, `39`, `43`, `23` — gồm các chữ số **0**, **1**, **2**, **3**, **4**, **9**.
 
 Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ là có liên hệ. Đo trên toàn bộ lịch sử thì không: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt đúng 19% số kỳ, bằng đúng mức của một chữ số lấy ngẫu nhiên.
 
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
-| 9 | 4 kỳ | 07-09-2026 | 43.05% |
-| 0 | 2 kỳ | 09-09-2026 | 65.61% |
-| 4 | 2 kỳ | 09-09-2026 | 65.61% |
-| 1 | 1 kỳ | 10-09-2026 | 81.00% |
-| 8 | 1 kỳ | 10-09-2026 | 81.00% |
-| 2 | 0 kỳ | 11-09-2026 | 100.00% |
+| 3 | 6 kỳ | 06-09-2026 | 28.24% |
+| 9 | 5 kỳ | 07-09-2026 | 34.87% |
+| 0 | 3 kỳ | 09-09-2026 | 53.14% |
+| 4 | 3 kỳ | 09-09-2026 | 53.14% |
+| 2 | 1 kỳ | 11-09-2026 | 81.00% |
+| 1 | 0 kỳ | 12-09-2026 | 100.00% |
 
   <h3>Chu kỳ A, B của giải bảy thứ nhất</h3>
 
@@ -96,9 +96,9 @@ Biến cố: chữ số **A** (hàng chục) và **B** (hàng đơn vị) của 
 
 | Biến cố | Tỉ lệ/kỳ | Lượt trúng | Đang trượt | Lần trúng gần nhất | TB cách | Trung vị | 90% ≤ | Dài nhất | Ngưỡng báo |
 |:-------:|:--------:|:----------:|:----------:|:------------------:|:-------:|:--------:|:-----:|:--------:|:----------:|
-| **Chỉ A** | 19.2% | 1450 | **5 kỳ** | 06-09-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
-| **Chỉ B** | 19.2% | 1451 | **3 kỳ** | 08-09-2026 | 5.2 kỳ | 4 | 11 | 34 | 15 kỳ |
-| **A hoặc B** | 34.9% | 2638 | **3 kỳ** | 08-09-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
+| **Chỉ A** | 19.2% | 1450 | **6 kỳ** | 06-09-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
+| **Chỉ B** | 19.2% | 1452 | **0 kỳ** | 12-09-2026 | 5.2 kỳ | 4 | 11 | 34 | 15 kỳ |
+| **A hoặc B** | 34.9% | 2639 | **0 kỳ** | 12-09-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
 
 Ngưỡng của **A hoặc B** đặt ở mức báo sớm 5 kỳ theo yêu cầu (độ hiếm ~11,6% — sẽ kêu vài lần mỗi tháng); A và B riêng lẻ theo mức hiếm 5% (15 kỳ). Chạm ngưỡng nghĩa là chuỗi chờ đã dài so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn.
 
@@ -120,9 +120,9 @@ Cột phải tăng dần chỉ vì càng nhiều kỳ thì càng nhiều lượt
 <details>
   <summary><h2>Analysis of one-year Loto results (Phân tích kết quả lô tô trong 1 năm)</h2></summary>
 
-  Max: 122. Min: 78.
+  Max: 122. Min: 79.
 
-  Mean: 97.47. Standard deviation: 9.65.
+  Mean: 97.47. Standard deviation: 9.61.
 
   <h3>Detail (Chi tiết)</h3>
 
