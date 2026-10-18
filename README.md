@@ -10,7 +10,7 @@ Dự án này được tạo bởi [Khiêm Đoàn](https://github.com/khiemdoan)
 
 | Lottery (Xổ số) | Loto (Lô tô) |
 | :------------: | :----------: |
-| <table><tr><td>Date (Ngày)</td><td>17-10-2026</td></tr><tr><td>Special (Giải đặc biệt)</td><td>64538</td></tr><tr><td>First (Giải nhất)</td><td>25177</td></tr><tr><td>Second (Giải nhì)</td><td>22134, 74852</td></tr><tr><td rowspan="2">Third (Giải ba)</td><td>36617, 82437, 82197</td></tr><tr><td>49442, 06571, 19833</td></tr><tr><td>Fourth (Giải tư)</td><td>7094, 2170, 6339, 9077</td></tr><tr><td rowspan="2">Fifth (Giải năm)</td><td>2950, 7987, 0789</td></tr><tr><td>5956, 6899, 4148</td></tr><tr><td>Sixth (Giải sáu)</td><td>916, 275, 785</td></tr><tr><td>Seventh (Giải bảy)</td><td>59, 49, 26, 01</td></tr></table> | <table><tr><td>First (Đầu)</td><td>Last (Đuôi)</td></tr><tr><td>0</td><td>1</td></tr><tr><td>1</td><td>6, 7</td></tr><tr><td>2</td><td>6</td></tr><tr><td>3</td><td>3, 4, 7, 8, 9</td></tr><tr><td>4</td><td>2, 8, 9</td></tr><tr><td>5</td><td>0, 2, 6, 9</td></tr><tr><td>6</td><td>-</td></tr><tr><td>7</td><td>0, 1, 5, 7, 7</td></tr><tr><td>8</td><td>5, 7, 9</td></tr><tr><td>9</td><td>4, 7, 9</td></tr></table> |
+| <table><tr><td>Date (Ngày)</td><td>18-10-2026</td></tr><tr><td>Special (Giải đặc biệt)</td><td>84642</td></tr><tr><td>First (Giải nhất)</td><td>31053</td></tr><tr><td>Second (Giải nhì)</td><td>02918, 26414</td></tr><tr><td rowspan="2">Third (Giải ba)</td><td>08419, 69920, 96611</td></tr><tr><td>90003, 49085, 18235</td></tr><tr><td>Fourth (Giải tư)</td><td>7732, 2937, 7948, 0695</td></tr><tr><td rowspan="2">Fifth (Giải năm)</td><td>7607, 4654, 6131</td></tr><tr><td>4116, 3869, 3213</td></tr><tr><td>Sixth (Giải sáu)</td><td>305, 626, 542</td></tr><tr><td>Seventh (Giải bảy)</td><td>44, 04, 67, 10</td></tr></table> | <table><tr><td>First (Đầu)</td><td>Last (Đuôi)</td></tr><tr><td>0</td><td>3, 4, 5, 7</td></tr><tr><td>1</td><td>0, 1, 3, 4, 6, 8, 9</td></tr><tr><td>2</td><td>0, 6</td></tr><tr><td>3</td><td>1, 2, 5, 7</td></tr><tr><td>4</td><td>2, 2, 4, 8</td></tr><tr><td>5</td><td>3, 4</td></tr><tr><td>6</td><td>7, 9</td></tr><tr><td>7</td><td>-</td></tr><tr><td>8</td><td>5</td></tr><tr><td>9</td><td>5</td></tr></table> |
 
 ## Data (Dữ liệu)
 
@@ -59,37 +59,40 @@ Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác su
 
   <h3>Số khan vừa về kỳ này</h3>
 
-Kỳ này không có số khan nào vừa về (ngưỡng: chữ số vắng ≥ 10 kỳ, con số vắng ≥ 230 kỳ).
+| Vừa về | Vắng trước đó | Lần cuối trước chuỗi | Độ hiếm của chuỗi vừa dứt |
+|:------:|:-------------:|:--------------------:|:-------------------------:|
+| chữ số **2** :warning: | 17 kỳ | 30-09-2026 | 2.8% |
+| chữ số **4** | 11 kỳ | 06-10-2026 | 9.8% |
+
+Chuỗi khan đã kết thúc — bảng tổng kết quá khứ, không làm số vừa về dễ hay khó ra hơn ở kỳ tới.
 
 
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
-| 2 :warning: | 17 kỳ | 30-09-2026 | 2.78% |
-| 0 :warning: | 16 kỳ | 01-10-2026 | 3.43% |
-| 4 | 11 kỳ | 06-10-2026 | 9.85% |
-| 7 | 5 kỳ | 12-10-2026 | 34.87% |
-| 1 | 4 kỳ | 13-10-2026 | 43.05% |
-| 9 | 3 kỳ | 14-10-2026 | 53.14% |
-| 5 | 1 kỳ | 16-10-2026 | 81.00% |
-| 6 | 1 kỳ | 16-10-2026 | 81.00% |
-| 3 | 0 kỳ | 17-10-2026 | 100.00% |
-| 8 | 0 kỳ | 17-10-2026 | 100.00% |
+| 0 :warning: | 17 kỳ | 01-10-2026 | 2.78% |
+| 7 | 6 kỳ | 12-10-2026 | 28.24% |
+| 1 | 5 kỳ | 13-10-2026 | 34.87% |
+| 9 | 4 kỳ | 14-10-2026 | 43.05% |
+| 5 | 2 kỳ | 16-10-2026 | 65.61% |
+| 6 | 2 kỳ | 16-10-2026 | 65.61% |
+| 3 | 1 kỳ | 17-10-2026 | 81.00% |
+| 8 | 1 kỳ | 17-10-2026 | 81.00% |
+| 2 | 0 kỳ | 18-10-2026 | 100.00% |
+| 4 | 0 kỳ | 18-10-2026 | 100.00% |
 
   <h3>Chữ số của giải bảy kỳ mới nhất</h3>
 
-Giải bảy kỳ này: `59`, `49`, `26`, `01` — gồm các chữ số **0**, **1**, **2**, **4**, **5**, **6**, **9**.
+Giải bảy kỳ này: `44`, `04`, `67`, `10` — gồm các chữ số **0**, **1**, **4**, **6**, **7**.
 
 Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ là có liên hệ. Đo trên toàn bộ lịch sử thì không: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt đúng 19% số kỳ, bằng đúng mức của một chữ số lấy ngẫu nhiên.
 
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
-| 2 :warning: | 17 kỳ | 30-09-2026 | 2.78% |
-| 0 :warning: | 16 kỳ | 01-10-2026 | 3.43% |
-| 4 | 11 kỳ | 06-10-2026 | 9.85% |
-| 1 | 4 kỳ | 13-10-2026 | 43.05% |
-| 9 | 3 kỳ | 14-10-2026 | 53.14% |
-| 5 | 1 kỳ | 16-10-2026 | 81.00% |
-| 6 | 1 kỳ | 16-10-2026 | 81.00% |
+| 0 :warning: | 17 kỳ | 01-10-2026 | 2.78% |
+| 7 | 6 kỳ | 12-10-2026 | 28.24% |
+| 1 | 5 kỳ | 13-10-2026 | 34.87% |
+| 6 | 2 kỳ | 16-10-2026 | 65.61% |
+| 4 | 0 kỳ | 18-10-2026 | 100.00% |
 
   <h3>Chu kỳ A, B của giải bảy thứ nhất</h3>
 
@@ -97,9 +100,9 @@ Biến cố: chữ số **A** (hàng chục) và **B** (hàng đơn vị) của 
 
 | Biến cố | Tỉ lệ/kỳ | Lượt trúng | Đang trượt | Lần trúng gần nhất | TB cách | Trung vị | 90% ≤ | Dài nhất | Ngưỡng báo |
 |:-------:|:--------:|:----------:|:----------:|:------------------:|:-------:|:--------:|:-----:|:--------:|:----------:|
-| **Chỉ A** | 19.2% | 1457 | **7 kỳ** | 10-10-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
-| **Chỉ B** | 19.3% | 1461 | **2 kỳ** | 15-10-2026 | 5.2 kỳ | 4 | 11 | 34 | 15 kỳ |
-| **A hoặc B** | 35.0% | 2653 | **2 kỳ** | 15-10-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
+| **Chỉ A** | 19.2% | 1458 | **0 kỳ** | 18-10-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
+| **Chỉ B** | 19.3% | 1462 | **0 kỳ** | 18-10-2026 | 5.2 kỳ | 4 | 11 | 34 | 14 kỳ |
+| **A hoặc B** | 35.0% | 2654 | **0 kỳ** | 18-10-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
 
 Ngưỡng của **A hoặc B** đặt ở mức báo sớm 5 kỳ theo yêu cầu (độ hiếm ~11,6% — sẽ kêu vài lần mỗi tháng); A và B riêng lẻ theo mức hiếm 5% (15 kỳ). Chạm ngưỡng nghĩa là chuỗi chờ đã dài so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn.
 
@@ -123,7 +126,7 @@ Cột phải tăng dần chỉ vì càng nhiều kỳ thì càng nhiều lượt
 
   Max: 121. Min: 82.
 
-  Mean: 97.47. Standard deviation: 9.29.
+  Mean: 97.47. Standard deviation: 9.28.
 
   <h3>Detail (Chi tiết)</h3>
 
