@@ -10,7 +10,7 @@ Dự án này được tạo bởi [Khiêm Đoàn](https://github.com/khiemdoan)
 
 | Lottery (Xổ số) | Loto (Lô tô) |
 | :------------: | :----------: |
-| <table><tr><td>Date (Ngày)</td><td>09-11-2026</td></tr><tr><td>Special (Giải đặc biệt)</td><td>03372</td></tr><tr><td>First (Giải nhất)</td><td>38696</td></tr><tr><td>Second (Giải nhì)</td><td>30610, 92390</td></tr><tr><td rowspan="2">Third (Giải ba)</td><td>69375, 98904, 81351</td></tr><tr><td>88131, 25712, 14883</td></tr><tr><td>Fourth (Giải tư)</td><td>4981, 9077, 0426, 9458</td></tr><tr><td rowspan="2">Fifth (Giải năm)</td><td>4388, 3920, 9588</td></tr><tr><td>7625, 0496, 9953</td></tr><tr><td>Sixth (Giải sáu)</td><td>672, 386, 632</td></tr><tr><td>Seventh (Giải bảy)</td><td>92, 59, 52, 83</td></tr></table> | <table><tr><td>First (Đầu)</td><td>Last (Đuôi)</td></tr><tr><td>0</td><td>4</td></tr><tr><td>1</td><td>0, 2</td></tr><tr><td>2</td><td>0, 5, 6</td></tr><tr><td>3</td><td>1, 2</td></tr><tr><td>4</td><td>-</td></tr><tr><td>5</td><td>1, 2, 3, 8, 9</td></tr><tr><td>6</td><td>-</td></tr><tr><td>7</td><td>2, 2, 5, 7</td></tr><tr><td>8</td><td>1, 3, 3, 6, 8, 8</td></tr><tr><td>9</td><td>0, 2, 6, 6</td></tr></table> |
+| <table><tr><td>Date (Ngày)</td><td>10-11-2026</td></tr><tr><td>Special (Giải đặc biệt)</td><td>73683</td></tr><tr><td>First (Giải nhất)</td><td>25992</td></tr><tr><td>Second (Giải nhì)</td><td>46401, 80718</td></tr><tr><td rowspan="2">Third (Giải ba)</td><td>34541, 62689, 58806</td></tr><tr><td>26594, 11823, 33335</td></tr><tr><td>Fourth (Giải tư)</td><td>8889, 8400, 5739, 5668</td></tr><tr><td rowspan="2">Fifth (Giải năm)</td><td>6370, 8957, 4414</td></tr><tr><td>5050, 6394, 7747</td></tr><tr><td>Sixth (Giải sáu)</td><td>868, 593, 607</td></tr><tr><td>Seventh (Giải bảy)</td><td>14, 00, 83, 56</td></tr></table> | <table><tr><td>First (Đầu)</td><td>Last (Đuôi)</td></tr><tr><td>0</td><td>0, 0, 1, 6, 7</td></tr><tr><td>1</td><td>4, 4, 8</td></tr><tr><td>2</td><td>3</td></tr><tr><td>3</td><td>5, 9</td></tr><tr><td>4</td><td>1, 7</td></tr><tr><td>5</td><td>0, 6, 7</td></tr><tr><td>6</td><td>8, 8</td></tr><tr><td>7</td><td>0</td></tr><tr><td>8</td><td>3, 3, 9, 9</td></tr><tr><td>9</td><td>2, 3, 4, 4</td></tr></table> |
 
 ## Data (Dữ liệu)
 
@@ -59,35 +59,42 @@ Mỗi chữ số nằm trong đúng **19/100** số hai chữ số, nên xác su
 
   <h3>Số khan vừa về kỳ này</h3>
 
-Kỳ này không có số khan nào vừa về (ngưỡng: chữ số vắng ≥ 10 kỳ, con số vắng ≥ 230 kỳ).
+| Vừa về | Vắng trước đó | Lần cuối trước chuỗi | Độ hiếm của chuỗi vừa dứt |
+|:------:|:-------------:|:--------------------:|:-------------------------:|
+| chữ số **3** :warning: | 16 kỳ | 24-10-2026 | 3.4% |
+| chữ số **8** :warning: | 15 kỳ | 25-10-2026 | 4.2% |
+
+Chuỗi khan đã kết thúc — bảng tổng kết quá khứ, không làm số vừa về dễ hay khó ra hơn ở kỳ tới.
 
 
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
-| 3 :warning: | 16 kỳ | 24-10-2026 | 3.43% |
-| 8 :warning: | 15 kỳ | 25-10-2026 | 4.24% |
-| 5 | 9 kỳ | 31-10-2026 | 15.01% |
-| 9 | 7 kỳ | 02-11-2026 | 22.88% |
-| 0 | 4 kỳ | 05-11-2026 | 43.05% |
-| 1 | 2 kỳ | 07-11-2026 | 65.61% |
-| 4 | 2 kỳ | 07-11-2026 | 65.61% |
-| 6 | 1 kỳ | 08-11-2026 | 81.00% |
-| 2 | 0 kỳ | 09-11-2026 | 100.00% |
-| 7 | 0 kỳ | 09-11-2026 | 100.00% |
+| 5 | 10 kỳ | 31-10-2026 | 12.16% |
+| 9 | 8 kỳ | 02-11-2026 | 18.53% |
+| 0 | 5 kỳ | 05-11-2026 | 34.87% |
+| 1 | 3 kỳ | 07-11-2026 | 53.14% |
+| 4 | 3 kỳ | 07-11-2026 | 53.14% |
+| 6 | 2 kỳ | 08-11-2026 | 65.61% |
+| 2 | 1 kỳ | 09-11-2026 | 81.00% |
+| 7 | 1 kỳ | 09-11-2026 | 81.00% |
+| 3 | 0 kỳ | 10-11-2026 | 100.00% |
+| 8 | 0 kỳ | 10-11-2026 | 100.00% |
 
   <h3>Chữ số của giải bảy kỳ mới nhất</h3>
 
-Giải bảy kỳ này: `92`, `59`, `52`, `83` — gồm các chữ số **2**, **3**, **5**, **8**, **9**.
+Giải bảy kỳ này: `14`, `00`, `83`, `56` — gồm các chữ số **0**, **1**, **3**, **4**, **5**, **6**, **8**.
 
 Giải bảy quay trước giải đặc biệt vài phút nên hay bị nghĩ là có liên hệ. Đo trên toàn bộ lịch sử thì không: mỗi chữ số của giải bảy xuất hiện ở 2 số cuối giải đặc biệt đúng 19% số kỳ, bằng đúng mức của một chữ số lấy ngẫu nhiên.
 
 | Chữ số | Vắng liên tiếp | Lần cuối xuất hiện | Độ hiếm của chuỗi |
 |:------:|:--------------:|:------------------:|:-----------------:|
-| 3 :warning: | 16 kỳ | 24-10-2026 | 3.43% |
-| 8 :warning: | 15 kỳ | 25-10-2026 | 4.24% |
-| 5 | 9 kỳ | 31-10-2026 | 15.01% |
-| 9 | 7 kỳ | 02-11-2026 | 22.88% |
-| 2 | 0 kỳ | 09-11-2026 | 100.00% |
+| 5 | 10 kỳ | 31-10-2026 | 12.16% |
+| 0 | 5 kỳ | 05-11-2026 | 34.87% |
+| 1 | 3 kỳ | 07-11-2026 | 53.14% |
+| 4 | 3 kỳ | 07-11-2026 | 53.14% |
+| 6 | 2 kỳ | 08-11-2026 | 65.61% |
+| 3 | 0 kỳ | 10-11-2026 | 100.00% |
+| 8 | 0 kỳ | 10-11-2026 | 100.00% |
 
   <h3>Chu kỳ A, B của giải bảy thứ nhất</h3>
 
@@ -95,9 +102,9 @@ Biến cố: chữ số **A** (hàng chục) và **B** (hàng đơn vị) của 
 
 | Biến cố | Tỉ lệ/kỳ | Lượt trúng | Đang trượt | Lần trúng gần nhất | TB cách | Trung vị | 90% ≤ | Dài nhất | Ngưỡng báo |
 |:-------:|:--------:|:----------:|:----------:|:------------------:|:-------:|:--------:|:-----:|:--------:|:----------:|
-| **Chỉ A** | 19.2% | 1464 | **9 kỳ** | 31-10-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
-| **Chỉ B** | 19.3% | 1466 | **0 kỳ** | 09-11-2026 | 5.2 kỳ | 4 | 11 | 34 | 14 kỳ |
-| **A hoặc B** | 35.0% | 2663 | **0 kỳ** | 09-11-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
+| **Chỉ A** | 19.2% | 1464 | **10 kỳ** | 31-10-2026 | 5.2 kỳ | 4 | 11 | 45 | 15 kỳ |
+| **Chỉ B** | 19.3% | 1466 | **1 kỳ** | 09-11-2026 | 5.2 kỳ | 4 | 11 | 34 | 14 kỳ |
+| **A hoặc B** | 35.0% | 2663 | **1 kỳ** | 09-11-2026 | 2.9 kỳ | 2 | 6 | 21 | 5 kỳ |
 
 Ngưỡng của **A hoặc B** đặt ở mức báo sớm 5 kỳ theo yêu cầu (độ hiếm ~11,6% — sẽ kêu vài lần mỗi tháng); A và B riêng lẻ theo mức hiếm 5% (15 kỳ). Chạm ngưỡng nghĩa là chuỗi chờ đã dài so với nhịp lịch sử — nó KHÔNG làm kỳ tới dễ trúng hơn.
 
@@ -119,9 +126,9 @@ Cột phải tăng dần chỉ vì càng nhiều kỳ thì càng nhiều lượt
 <details>
   <summary><h2>Analysis of one-year Loto results (Phân tích kết quả lô tô trong 1 năm)</h2></summary>
 
-  Max: 125. Min: 81.
+  Max: 125. Min: 82.
 
-  Mean: 97.47. Standard deviation: 9.6.
+  Mean: 97.47. Standard deviation: 9.58.
 
   <h3>Detail (Chi tiết)</h3>
 
